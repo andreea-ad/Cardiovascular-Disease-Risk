@@ -13,5 +13,6 @@
 .externalNativeBuild
 .cxx
 /app/google-services.json
+/app/*.json
 *.json
 /docs/*

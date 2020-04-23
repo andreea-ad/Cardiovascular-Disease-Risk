@@ -47,7 +47,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:280176918320:android:52e5899ff884ee443112f5",
         "android_client_info": {
-          "package_name": "ro.uvt.asavoaei.andreea.cardiovasculardiseaserisk"
+          "package_name": "ro.uvt.asavoaei.andreea.cardiovascularapp"
         }
       },
       "oauth_client": [
@@ -55,7 +55,7 @@
           "client_id": "280176918320-hmeoemddcof9hh6ivpi3p729t0g97mqk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "ro.uvt.asavoaei.andreea.cardiovasculardiseaserisk",
+            "package_name": "ro.uvt.asavoaei.andreea.cardiovascularapp",
             "certificate_hash": "9880d1b36f7fcd8ae61584cbc48614b0c59114af"
           }
         },

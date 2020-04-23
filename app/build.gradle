@@ -6,7 +6,7 @@ android {
 
 
     defaultConfig {
-        applicationId "ro.uvt.asavoaei.andreea.cardiovasculardiseaserisk"
+        applicationId "ro.uvt.asavoaei.andreea.cardiovascularapp"
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/timeRg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="15dp">
+
+            <RadioButton
+                android:id="@+id/weeklyRb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight=".235"
+                android:background="@drawable/radio_states_green"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/weekly_ro"
+                android:textColor="@drawable/radio_text" />
+
+            <RadioButton
+                android:id="@+id/monthlyRb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight=".235"
+                android:background="@drawable/radio_states_green"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/monthly_ro"
+                android:textColor="@drawable/radio_text" />
+
+            <RadioButton
+                android:id="@+id/yearlyRb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight=".235"
+                android:background="@drawable/radio_states_green"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/yearly_ro"
+                android:textColor="@drawable/radio_text" />
+        </RadioGroup>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bpChartCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/bpChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bpChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/bp_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/bpChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/bpChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/pulseChartCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/pulseChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/pulseChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/the_pulse_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/pulseChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/pulseChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bpTempChartCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/bpTempChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bpTempChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/bp_temp_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/bpTempChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/bpTempChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bpPressureChartCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/bpPressureChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bpPressureChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/bp_pressure_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/bpPressureChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/bpPressureChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bpBMIChartCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/bpBMIChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bpBMIChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/bp_bmi_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/bpBMIChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/bpBMIChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bpStagesChartCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/bpStagesChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bpStagesChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/bp_stages_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/bpStagesChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/bpStagesChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView>

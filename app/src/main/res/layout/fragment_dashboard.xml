@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/greetingTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="65dp"
+        android:textSize="32sp" />
+
+    <LinearLayout
+        android:id="@+id/bloodPressureLl"
+        android:layout_width="match_parent"
+        android:layout_height="281dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/systolicCv"
+            android:layout_width="155dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/systolicRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/default_layout_margin">
+
+                <LinearLayout
+                    android:id="@+id/systolicTitleLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/systolicTitleTv"
+                        android:layout_width="72dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sys_dash_ro" />
+
+                    <ImageView
+                        android:id="@+id/systolicHeartIv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_favorite_border_black_24dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/systolicValueLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/systolicTitleLl"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/systolicValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/systolicMetricTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mmhg" />
+
+                </LinearLayout>
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/systolicLc"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_below="@id/systolicValueLl"
+                    android:layout_margin="5dp" />
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/diastolicCv"
+            android:layout_width="155dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/diastolicRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/default_layout_margin">
+
+                <LinearLayout
+                    android:id="@+id/diastolicTitleLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/diastolicTitleTv"
+                        android:layout_width="72dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dia_dash_ro" />
+
+                    <ImageView
+                        android:id="@+id/diastolicHeartIv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_favorite_border_black_24dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/diastolicValueLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/diastolicTitleLl"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/diastolicValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/diastolicMetricTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mmhg" />
+
+                </LinearLayout>
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/diastolicLc"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_below="@id/diastolicValueLl"
+                    android:layout_margin="5dp" />
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pulseAndCholesterolLl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/pulseCv"
+            android:layout_width="155dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/pulseRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/default_layout_margin">
+
+                <LinearLayout
+                    android:id="@+id/pulseTitleLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/pulseTitleTv"
+                        android:layout_width="72dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pulse_dash_ro" />
+
+                    <ImageView
+                        android:id="@+id/electrocardiographiIv"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/electrocardiography" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/pulseValueLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/pulseTitleLl"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/pulseValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/pulseMetricTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bpm" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cholesterolCv"
+            android:layout_width="155dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/cholesterolRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/default_layout_margin">
+
+                <LinearLayout
+                    android:id="@+id/cholesterolTitleLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/cholesterolTitleTv"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cholesterol_dash_ro" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cholesterolValueLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/cholesterolTitleLl"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/cholesterolValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/cholesterolMetricTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mgdl" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</LinearLayout>

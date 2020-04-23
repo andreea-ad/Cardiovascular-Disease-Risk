@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="header_title">40sp</dimen>
+    <dimen name="cardview_corner_radius">20dp</dimen>
+    <dimen name="default_layout_margin">10dp</dimen>
+    <dimen name="header_height">260dp</dimen>
+    <dimen name="cardview_width">300dp</dimen>
+    <dimen name="default_text_size">18sp</dimen>
+    <dimen name="default_spinner_height">20dp</dimen>
+</resources>

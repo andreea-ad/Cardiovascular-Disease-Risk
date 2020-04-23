@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
+        android:id="@+id/createAccountHeaderCpi"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="70dp"
+        app:direction="clockwise"
+        app:dotColor="@color/colorAccent"
+        app:dotWidth="16dp"
+        app:drawDot="true"
+        app:enableProgressAnimation="true"
+        app:fillBackground="false"
+        app:formattingPattern="25"
+        app:gradientEndColor="@color/colorPrimary"
+        app:gradientType="linear"
+        app:progressBackgroundColor="@color/defaultGreyColor"
+        app:progressBackgroundStrokeWidth="8dp"
+        app:progressCap="round"
+        app:progressColor="@color/colorPrimary"
+        app:progressStrokeWidth="8dp"
+        app:startAngle="270"
+        app:textColor="@color/colorPrimary"
+        app:textSize="30sp" />
+
+    <RelativeLayout
+        android:id="@+id/createAccountRl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createAccountHeaderCpi"
+        android:layout_marginTop="20dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/firstNameCv"
+            android:layout_width="@dimen/cardview_width"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/firstNameRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/default_layout_margin">
+
+                <EditText
+                    android:id="@+id/firstNameEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/default_layout_margin"
+                    android:background="@android:color/transparent"
+                    android:drawablePadding="30dp"
+                    android:hint="@string/first_name_ro"
+                    android:inputType="text" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/lastNameCv"
+            android:layout_width="@dimen/cardview_width"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/firstNameCv"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/lastNameRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/default_layout_margin">
+
+                <EditText
+                    android:id="@+id/lastNameEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/default_layout_margin"
+                    android:background="@android:color/transparent"
+                    android:drawablePadding="30dp"
+                    android:hint="@string/last_name_ro"
+                    android:inputType="text" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cityCv"
+            android:layout_width="@dimen/cardview_width"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lastNameCv"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/cityRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/default_layout_margin">
+
+                <EditText
+                    android:id="@+id/cityEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/default_layout_margin"
+                    android:background="@android:color/transparent"
+                    android:clickable="false"
+                    android:drawablePadding="30dp"
+                    android:textColor="@color/defaultGreyColor" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNext50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createAccountRl"
+        android:layout_alignEnd="@id/createAccountRl"
+        android:layout_marginTop="160dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_keyboard_arrow_right_white_24dp" />
+</RelativeLayout>

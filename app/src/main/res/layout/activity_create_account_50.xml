@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
+        android:id="@+id/createAccountHeaderCpi"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="70dp"
+        app:direction="clockwise"
+        app:dotColor="@color/colorAccent"
+        app:dotWidth="16dp"
+        app:drawDot="true"
+        app:enableProgressAnimation="true"
+        app:fillBackground="false"
+        app:formattingPattern="50"
+        app:gradientEndColor="@color/colorPrimary"
+        app:gradientType="linear"
+        app:progressBackgroundColor="@color/defaultGreyColor"
+        app:progressBackgroundStrokeWidth="8dp"
+        app:progressCap="round"
+        app:progressColor="@color/colorPrimary"
+        app:progressStrokeWidth="8dp"
+        app:startAngle="270"
+        app:textColor="@color/colorPrimary"
+        app:textSize="30sp" />
+
+    <RelativeLayout
+        android:id="@+id/createAccountRl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createAccountHeaderCpi"
+        android:layout_marginTop="20dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/birthdayCv"
+            android:layout_width="@dimen/cardview_width"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/birthdayRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/default_layout_margin">
+
+                <EditText
+                    android:id="@+id/birthdayEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/default_layout_margin"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:drawablePadding="30dp"
+                    android:hint="@string/date_of_birth_ro" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/genderCv"
+            android:layout_width="@dimen/cardview_width"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/birthdayCv"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/genderRl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/default_layout_margin">
+
+                <Spinner
+                    android:id="@+id/genderSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="0dp" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:id="@+id/bodyDataLl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/genderCv"
+            android:layout_marginStart="30dp"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/heightCv"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <RelativeLayout
+                    android:id="@+id/heightRl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_layout_margin">
+
+                    <EditText
+                        android:id="@+id/heightEt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/default_layout_margin"
+                        android:background="@android:color/transparent"
+                        android:drawablePadding="30dp"
+                        android:hint="@string/height_ro"
+                        android:inputType="number" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/heightPromptTv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:text="@string/cm"
+                android:textSize="@dimen/default_text_size" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/smokerCb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bodyDataLl"
+            android:layout_marginStart="40dp"
+            android:text="@string/smoker_ro"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp" />
+
+        <CheckBox
+            android:id="@+id/pregnantCb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/smokerCb"
+            android:layout_marginStart="40dp"
+            android:text="@string/pregnant_ro"
+            android:textColor="@color/defaultGreyColor"
+            android:textSize="16sp"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNext75"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createAccountRl"
+        android:layout_alignEnd="@id/createAccountRl"
+        android:layout_marginTop="90dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_keyboard_arrow_right_white_24dp" />
+
+</RelativeLayout>

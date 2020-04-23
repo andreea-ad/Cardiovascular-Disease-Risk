@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/sortByTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/sort_by_ro"
+        android:textAllCaps="true" />
+
+    <RadioGroup
+        android:id="@+id/timeRg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <RadioButton
+            android:id="@+id/recordingDateRb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight=".235"
+            android:background="@drawable/radio_states_green"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/recording_date_ro"
+            android:textColor="@drawable/radio_text" />
+
+        <RadioButton
+            android:id="@+id/bloodPressureRb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight=".235"
+            android:background="@drawable/radio_states_green"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/blood_pressure_ro"
+            android:textColor="@drawable/radio_text" />
+
+        <RadioButton
+            android:id="@+id/pulseRb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight=".235"
+            android:background="@drawable/radio_states_green"
+            android:button="@null"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/pulse_dash_ro"
+            android:textColor="@drawable/radio_text" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/sortRg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <RadioButton
+            android:id="@+id/sortAscendingRb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:checked="true"
+            android:text="@string/sort_ascending_ro" />
+
+        <RadioButton
+            android:id="@+id/sortDescendingRb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:text="@string/sort_descending_ro" />
+    </RadioGroup>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cardioHistoryRv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp" />
+
+</LinearLayout>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="260dp"
+    android:layout_centerHorizontal="true"
+    app:cardCornerRadius="@dimen/cardview_corner_radius"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/cardioHistoryRl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_layout_margin">
+
+            <TextView
+                android:id="@+id/recordingDateTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:text="13 Februarie 2020, 13:40"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/heartIv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="130dp"
+                android:layout_toEndOf="@id/recordingDateTv"
+                android:src="@drawable/ic_favorite_border_black_24dp" />
+
+            <TextView
+                android:id="@+id/bloodPressurePromptTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/recordingDateTv"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/blood_pressure_ro"
+                android:textColor="@color/defaultGreyColor"
+                android:textSize="16sp" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/weatherRecordCv"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/heartIv"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/bloodPressurePromptTv"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <RelativeLayout
+                    android:id="@+id/weatherRecordRl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp">
+
+                    <TextView
+                        android:id="@+id/temperaturePromptTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/temperature_ro"
+                        android:textColor="@color/defaultGreyColor"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/temperatureValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/temperaturePromptTv"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/humidityPromptTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/temperaturePromptTv"
+                        android:text="@string/humidity_ro"
+                        android:textColor="@color/defaultGreyColor"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/humidityValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/temperatureValueTv"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/humidityPromptTv"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/pressurePromptTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/humidityPromptTv"
+                        android:text="@string/pressure_ro"
+                        android:textColor="@color/defaultGreyColor"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/pressureValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/humidityValueTv"
+                        android:layout_marginStart="4dp"
+                        android:layout_toEndOf="@id/humidityPromptTv"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/nebulosityPromptTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/pressurePromptTv"
+                        android:text="@string/nebulosity_ro"
+                        android:textColor="@color/defaultGreyColor"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/nebulosityValueTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/pressureValueTv"
+                        android:layout_marginStart="4dp"
+                        android:layout_toEndOf="@id/nebulosityPromptTv"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/sunIv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:layout_toEndOf="@id/temperatureValueTv"
+                        android:src="@drawable/ic_wb_sunny_black_24dp" />
+                </RelativeLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/bloodPressureValueTv"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bloodPressurePromptTv"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pulsePromptTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bloodPressureValueTv"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/pulse_dash_ro"
+                android:textColor="@color/defaultGreyColor"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/pulseValueTv"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pulsePromptTv"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cholesterolPromptTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pulseValueTv"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:text="Colesterol"
+                android:textColor="@color/defaultGreyColor"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/cholesterolValueTv"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cholesterolPromptTv"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/bmiPromptTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cholesterolValueTv"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/BMI"
+                android:textColor="@color/defaultGreyColor"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/bmiValueTv"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bmiPromptTv"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/pregnantCb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weatherRecordCv"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@id/cholesterolValueTv"
+                android:text="@string/pregnant_ro"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/smokerCb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pregnantCb"
+                android:layout_marginStart="101dp"
+                android:layout_toEndOf="@id/bmiPromptTv"
+                android:checked="true"
+                android:text="@string/smoker_ro"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

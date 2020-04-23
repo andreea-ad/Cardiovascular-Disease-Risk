@@ -1,13 +1,27 @@
 package ro.uvt.asavoaei.andreea.cardiovascularapp.fragment;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,13 +46,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import ro.uvt.asavoaei.andreea.cardiovascularapp.R;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.dialog.LoadingDialog;
@@ -54,11 +74,18 @@ import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.PulseMarkerView;
 
 public class StatisticsFragment extends Fragment {
     private static final String TAG = StatisticsFragment.class.getName();
+    private static final int BLOOD_PRESSURE = 1;
+    private static final int PULSE = 2;
+    private static final int HUMIDITY = 3;
+    private static final int TEMPERATURE = 4;
+    private static final int WIND_SPEED = 5;
+    private static final int PRESSURE = 6;
     private static final String dateFormat = "dd-MM-yyyy";
     private LoadingDialog loadingDialog;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
+    private TextView chartTitleTv, bpTempCorrelationTv, bpPressureCorrelationTv;
     private RadioGroup timeRg;
     private String emailAddress = "", city = "";
     private int height = 0;
@@ -66,6 +93,8 @@ public class StatisticsFragment extends Fragment {
     private LocalDate currentDate = LocalDate.now();
     private int numberOfEntries = 7;
     private int numberOfLabels = numberOfEntries;
+    private int independentVariable = 0;
+    private int dependentVariable = 0;
 
     private List<CardioRecord> cardioRecordList = new ArrayList<>();
     private List<WeatherRecord> weatherRecordList = new ArrayList<>();
@@ -81,6 +110,7 @@ public class StatisticsFragment extends Fragment {
     private LineDataSet temperatureDataSet = new LineDataSet(null, null);
     private LineDataSet pressureDataSet = new LineDataSet(null, null);
     private LineDataSet BMIdataSet = new LineDataSet(null, null);
+
     private ArrayList<Entry> systolic = new ArrayList<>();
     private ArrayList<Entry> diastolic = new ArrayList<>();
     private ArrayList<Entry> pulse = new ArrayList<>();
@@ -88,11 +118,19 @@ public class StatisticsFragment extends Fragment {
     private ArrayList<Entry> pressure = new ArrayList<>();
     private ArrayList<Entry> BMI = new ArrayList<>();
 
+    private Map<Long, Integer> systolicObj = new HashMap<>();
+    private Map<Long, Integer> diastolicObj = new HashMap<>();
+    private Map<Long, Integer> pulseObj = new HashMap<>();
+    private Map<Long, Float> temperatureObj = new HashMap<>();
+    private Map<Long, Float> pressureObj = new HashMap<>();
+    private Map<Long, Integer> BMIObj = new HashMap<>();
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, null);
         loadingDialog = new LoadingDialog(getContext());
+        chartTitleTv = view.findViewById(R.id.bpTempChartTv);
         bloodPressureLc = view.findViewById(R.id.bpChart);
         pulseLc = view.findViewById(R.id.pulseChart);
         bloodPressureAndTemperatureLc = view.findViewById(R.id.bpTempChart);
@@ -100,9 +138,12 @@ public class StatisticsFragment extends Fragment {
         bloodPressureAndBMILc = view.findViewById(R.id.bpBMIChart);
         hypertensionStagesPc = view.findViewById(R.id.bpStagesChart);
         timeRg = view.findViewById(R.id.timeRg);
+        bpTempCorrelationTv = view.findViewById(R.id.bpTempCorrelationTv);
+        bpPressureCorrelationTv = view.findViewById(R.id.bpPressureCorrelationTv);
 
         if (firebaseAuth.getCurrentUser() != null) {
             emailAddress = firebaseAuth.getCurrentUser().getEmail();
+            //displayVariablePicker();
             startingDate = Date.from(currentDate.minusDays(numberOfEntries).atStartOfDay()
                     .atZone(ZoneId.systemDefault())
                     .toInstant());
@@ -131,12 +172,119 @@ public class StatisticsFragment extends Fragment {
                     createCharts();
                 }
             });
-
         }
-
         return view;
     }
 
+    private void displayVariablePicker(){
+        String[] cardioVariables = {"Tensiune arterială", "Puls"};
+        String[] weatherVariables = {"Umiditate", "Temperatură", "Viteza vântului", "Presiune atmosferică"};
+        String[] allVariables = {"Tensiune arterială", "Puls", "Umiditate", "Temperatură", "Viteza vântului", "Presiune atmosferică"};
+        int checkedVariable = 0;
+        AlertDialog displayIndependentVariablePicker = new AlertDialog.Builder(getActivity())
+                .setTitle("Alegeți variabila independentă")
+                .setSingleChoiceItems(allVariables, checkedVariable, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Toast.makeText(getContext(), "Checked: " + variables[which], Toast.LENGTH_SHORT).show();
+                        setVariable(allVariables[which], 0);
+                        String[] leftVariables = new String[4];
+                        int option = 0;
+                        for(String s : cardioVariables){
+                            if(s.equals(allVariables[which])){
+                                leftVariables = new String[weatherVariables.length];
+                                break;
+                            }
+                        }
+                        for(String s : weatherVariables){
+                            if(s.equals(allVariables[which])){
+                                leftVariables = new String[cardioVariables.length];
+                                option = 1;
+                                break;
+                            }
+                        }
+                        int i = 0;
+                        if(option == 0){
+                            for(String s : weatherVariables){
+                                leftVariables[i++] = s;
+                            }
+                        }else{
+                            for(String s : cardioVariables){
+                                leftVariables[i++] = s;
+                            }
+                        }
+
+                        String[] finalLeftVariables = leftVariables;
+                        AlertDialog displayDependentVariablePicker = new AlertDialog.Builder(getActivity())
+                                .setTitle("Alegeți variabila dependentă")
+                                .setSingleChoiceItems(leftVariables, checkedVariable, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog1, int which) {
+                                        setVariable(finalLeftVariables[which], 1);
+                                        dialog1.dismiss();
+                                        dialog.dismiss();
+                                        setChartTitle();
+                                        new PumpDataTask().execute();
+                                    }
+                                })
+                                .setNegativeButton("Anulează", null)
+                                .create();
+                        displayDependentVariablePicker.show();
+                        Log.d(TAG, "Ind var: " + independentVariable + " - dep var: " + dependentVariable);
+
+                    }
+                })
+                .setNegativeButton("Anulează", null)
+                .create();
+        displayIndependentVariablePicker.show();
+    }
+
+    private void setVariable(String variable, int option){
+        switch(variable){
+            case "Tensiune arterială":
+                if(option == 0){
+                    independentVariable = 1;
+                }else{
+                    dependentVariable = 1;
+                }
+                break;
+            case "Puls":
+                if(option == 0){
+                    independentVariable = 2;
+                }else{
+                    dependentVariable = 2;
+                }
+                break;
+            case "Umiditate":
+                if(option == 0){
+                    independentVariable = 3;
+                }else{
+                    dependentVariable = 3;
+                }
+                break;
+            case "Temperatură":
+                if(option == 0){
+                    independentVariable = 4;
+                }else{
+                    dependentVariable = 4;
+                }
+                break;
+            case "Viteza vântului":
+                if(option == 0){
+                    independentVariable = 5;
+                }else{
+                    dependentVariable = 5;
+                }
+                break;
+            case "Presiune atmosferică":
+                if(option == 0){
+                    independentVariable = 6;
+                }else{
+                    dependentVariable = 6;
+                }
+                break;
+        }
+    }
     private void retrieveUserProfile() {
         Query getUserProfileByEmail = databaseReference.child("user-profile").orderByChild("emailAddress").equalTo(emailAddress);
         getUserProfileByEmail.addValueEventListener(new ValueEventListener() {
@@ -176,7 +324,6 @@ public class StatisticsFragment extends Fragment {
                     }
                     createEntryLists();
                     createCharts();
-
                 }
             }
 
@@ -210,10 +357,63 @@ public class StatisticsFragment extends Fragment {
         });
     }
 
+    private void setChartTitle(){
+        String independentVariableStr = "";
+        String dependentVariableStr = "";
+        switch(independentVariable) {
+            case BLOOD_PRESSURE:
+                independentVariableStr += "Tensiune arterială";
+                break;
+            case PULSE:
+                independentVariableStr += "Puls";
+                break;
+            case HUMIDITY:
+                independentVariableStr += "Umiditate";
+                break;
+            case TEMPERATURE:
+                independentVariableStr += "Temperatură";
+                break;
+            case WIND_SPEED:
+                independentVariableStr += "Viteza vântului";
+                break;
+            case PRESSURE:
+                independentVariableStr += "Presiune atmosferică";
+                break;
+        }
+
+        switch(dependentVariable) {
+            case BLOOD_PRESSURE:
+                dependentVariableStr += "Tensiune arterială";
+                break;
+            case PULSE:
+                dependentVariableStr += "Puls";
+                break;
+            case HUMIDITY:
+                dependentVariableStr += "Umiditate";
+                break;
+            case TEMPERATURE:
+                dependentVariableStr += "Temperatură";
+                break;
+            case WIND_SPEED:
+                dependentVariableStr += "Viteza vântului";
+                break;
+            case PRESSURE:
+                dependentVariableStr += "Presiune atmosferică";
+                break;
+        }
+
+        String title = independentVariableStr + " - " + dependentVariableStr;
+        chartTitleTv.setText(title);
+    }
+
     private void createEntryListsForCardioRecords() {
         systolic = new ArrayList<>();
         diastolic = new ArrayList<>();
         pulse = new ArrayList<>();
+        systolicObj = new HashMap<>();
+        diastolicObj = new HashMap<>();
+        pulseObj = new HashMap<>();
+
         for (CardioRecord c : cardioRecordList) {
             try {
                 Date recordingDate = new SimpleDateFormat(dateFormat).parse(c.getRecordingDate());
@@ -222,9 +422,16 @@ public class StatisticsFragment extends Fragment {
                     LocalDate localDate = LocalDate.parse(c.getRecordingDate(), DateTimeFormatter.ofPattern(dateFormat));
                     Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
                     long timeMillis = date.getTime();
-                    systolic.add(new Entry(timeMillis, c.getSystolicBP()));
-                    diastolic.add(new Entry(timeMillis, c.getDiastolicBP()));
-                    pulse.add(new Entry(timeMillis, c.getPulse()));
+
+                    if(!systolicObj.containsKey(timeMillis) && !diastolicObj.containsKey(timeMillis) && !pulseObj.containsKey(timeMillis)) {
+                        systolicObj.put(timeMillis, c.getSystolicBP());
+                        diastolicObj.put(timeMillis, c.getDiastolicBP());
+                        pulseObj.put(timeMillis, c.getPulse());
+
+                        systolic.add(new Entry(timeMillis, c.getSystolicBP()));
+                        diastolic.add(new Entry(timeMillis, c.getDiastolicBP()));
+                        pulse.add(new Entry(timeMillis, c.getPulse()));
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -233,8 +440,18 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void createEntryListsForWeatherRecords() {
+        systolic = new ArrayList<>();
+        diastolic = new ArrayList<>();
+        pulse = new ArrayList<>();
+        systolicObj = new HashMap<>();
+        diastolicObj = new HashMap<>();
+        pulseObj = new HashMap<>();
+
         temperature = new ArrayList<>();
         pressure = new ArrayList<>();
+        temperatureObj = new HashMap<>();
+        pressureObj = new HashMap<>();
+
         for (CardioRecord c : cardioRecordList) {
             for (WeatherRecord w : weatherRecordList) {
                 if (c.getRecordingDate().equals(w.getRecordingDate()) && c.getRecordingHour().split(":")[0].equals(w.getRecordingHour().split(":")[0])) {
@@ -245,8 +462,25 @@ public class StatisticsFragment extends Fragment {
                             LocalDate localDate = LocalDate.parse(w.getRecordingDate(), DateTimeFormatter.ofPattern(dateFormat));
                             Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
                             long timeMillis = date.getTime();
-                            temperature.add(new Entry(timeMillis, (float) w.getTemperature()));
-                            pressure.add(new Entry(timeMillis, (float) w.getPressure()));
+
+                            if(!temperatureObj.containsKey(timeMillis) && !pressureObj.containsKey(timeMillis)) {
+                                Log.d(TAG, "Cardio: " + c + "\n" + "Weather: " + w);
+                                temperatureObj.put(timeMillis, (float) w.getTemperature());
+                                pressureObj.put(timeMillis, (float) w.getPressure());
+
+                                temperature.add(new Entry(timeMillis, (float) w.getTemperature()));
+                                pressure.add(new Entry(timeMillis, (float) w.getPressure()));
+                            }
+
+                            if(!systolicObj.containsKey(timeMillis) && !diastolicObj.containsKey(timeMillis) && !pulseObj.containsKey(timeMillis)) {
+                                systolicObj.put(timeMillis, c.getSystolicBP());
+                                diastolicObj.put(timeMillis, c.getDiastolicBP());
+                                pulseObj.put(timeMillis, c.getPulse());
+
+                                systolic.add(new Entry(timeMillis, c.getSystolicBP()));
+                                diastolic.add(new Entry(timeMillis, c.getDiastolicBP()));
+                                pulse.add(new Entry(timeMillis, c.getPulse()));
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -258,6 +492,7 @@ public class StatisticsFragment extends Fragment {
 
     private void createEntryListForBMI() {
         BMI = new ArrayList<>();
+        BMIObj = new HashMap<>();
         for (CardioRecord c : cardioRecordList) {
             try {
                 Date recordingDate = new SimpleDateFormat(dateFormat).parse(c.getRecordingDate());
@@ -266,18 +501,87 @@ public class StatisticsFragment extends Fragment {
                     LocalDate localDate = LocalDate.parse(c.getRecordingDate(), DateTimeFormatter.ofPattern(dateFormat));
                     Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
                     long timeMillis = date.getTime();
-                    BMI.add(new Entry(timeMillis, c.getWeight() / (int) Math.pow((double) height / 100, 2)));
+
+                    if(!BMIObj.containsKey(timeMillis)) {
+                        BMIObj.put(timeMillis, c.getWeight() / (int) Math.pow((double) height / 100, 2));
+                        BMI.add(new Entry(timeMillis, c.getWeight() / (int) Math.pow((double) height / 100, 2)));
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
     }
 
     private void createEntryLists() {
-        createEntryListsForCardioRecords();
+        //createEntryListsForCardioRecords();
         createEntryListsForWeatherRecords();
         createEntryListForBMI();
+        computeCorrelationCoefficient();
+    }
+
+    private void computeCorrelationCoefficient(){
+        Log.d(TAG, "Sizes: " + systolic.size() + " - " + diastolic.size() + " - " + temperature.size() + " - " + pressure.size());
+        double[] systolicData = new double[systolic.size()];
+        double[] diastolicData = new double[diastolic.size()];
+        double[] temperatureData = new double[temperature.size()];
+        double[] pressureData = new double[pressure.size()];
+        //double[] bmiData = new double[BMI.size()];
+
+        int i = 0;
+        for(Entry e : systolic){
+            systolicData[i++] = e.getY();
+        }
+        i = 0;
+        for(Entry e : diastolic){
+            diastolicData[i++] = e.getY();
+        }
+        i = 0;
+        for(Entry e : temperature){
+            temperatureData[i++] = e.getY();
+        }
+        i = 0;
+        for(Entry e : pressure){
+            pressureData[i++] = e.getY();
+        }
+//        i = 0;
+//        for(Entry e : BMI){
+//            bmiData[i++] = e.getY();
+//        }
+
+        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+        double temperatureSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, temperatureData);
+        double temperatureDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, temperatureData);
+
+        double pressureSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, pressureData);
+        double pressureDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, pressureData);
+
+//        double bmiSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, bmiData);
+//        double bmiDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, bmiData);
+
+        Log.d(TAG, "\nTEMP-SYS: " + temperatureSystolicCorrelationCoefficient + "\n" + "TEMP-DIA: " + temperatureDiastolicCorrelationCoefficient + "\n" +
+                "PRESSURE-SYS: " + pressureSystolicCorrelationCoefficient + "\n" + "PRESSURE-DIA: " + pressureDiastolicCorrelationCoefficient);
+
+
+        String temperatureSystolicCorrelationCoefficientString = String.valueOf(temperatureSystolicCorrelationCoefficient);
+        String temperatureDiastolicCorrelationCoefficientString = String.valueOf(temperatureDiastolicCorrelationCoefficient);
+        SpannableStringBuilder tempSpannable = new SpannableStringBuilder();
+        tempSpannable.append("Tensiune arterială sistolică - temperatură: ", new StyleSpan(Typeface.NORMAL), 0);
+        tempSpannable.append(temperatureSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED),0).append('\n');
+        tempSpannable.append("Tensiune arterială diastolică - temperatură: ", new StyleSpan(Typeface.NORMAL), 0);
+        tempSpannable.append(temperatureDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE),0);
+        bpTempCorrelationTv.setText(tempSpannable);
+
+        String pressureSystolicCorrelationCoefficientString = String.valueOf(pressureSystolicCorrelationCoefficient);
+        String pressureDiastolicCorrelationCoefficientString = String.valueOf(pressureDiastolicCorrelationCoefficient);
+        SpannableStringBuilder pressureSpannable = new SpannableStringBuilder();
+        pressureSpannable.append("Tensiune arterială sistolică - presiune atmosferică: ", new StyleSpan(Typeface.NORMAL), 0);
+        pressureSpannable.append(pressureSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED),0).append('\n');
+        pressureSpannable.append("Tensiune arterială diastolică - presiune atmosferică: ", new StyleSpan(Typeface.NORMAL), 0);
+        pressureSpannable.append(pressureDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE),0);
+        bpPressureCorrelationTv.setText(pressureSpannable);
+
     }
 
     private void showChartBloodPressure() {
@@ -357,10 +661,7 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                Log.d(TAG, "Label count: " + xAxisSystolic.getLabelCount());
-                Log.d(TAG, "Number of entries: " + numberOfEntries + " labels: " + numberOfLabels);
                 xAxisSystolic.setLabelCount(numberOfLabels);
-                Log.d(TAG, "Label count: " + xAxisSystolic.getLabelCount());
             }
         }
 
@@ -448,7 +749,7 @@ public class StatisticsFragment extends Fragment {
                     return simpleDateFormat.format(millisToDate);
                 }
             });
-            if (numberOfEntries > 7) {
+            if (numberOfEntries > 8) {
                 xAxisSystolic.setLabelCount(numberOfLabels);
             }
         }
@@ -578,7 +879,7 @@ public class StatisticsFragment extends Fragment {
                     return simpleDateFormat.format(new Date(millis + 1000000));
                 }
             });
-            if (numberOfEntries > 7) {
+            if (numberOfEntries > 8) {
                 xAxisSystolic.setLabelCount(numberOfLabels);
             }
         }
@@ -702,7 +1003,7 @@ public class StatisticsFragment extends Fragment {
 
                 }
             });
-            if (numberOfEntries > 7) {
+            if (numberOfEntries > 8) {
                 xAxisSystolic.setLabelCount(numberOfLabels);
             }
         }
@@ -826,7 +1127,7 @@ public class StatisticsFragment extends Fragment {
                     return simpleDateFormat.format(new Date(millis + 1000000));
                 }
             });
-            if (numberOfEntries > 7) {
+            if (numberOfEntries > 8) {
                 xAxisSystolic.setLabelCount(numberOfLabels);
             }
         }
@@ -918,7 +1219,6 @@ public class StatisticsFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             retrieveUserProfile();
-            //retrieveCardioRecords();
             return null;
         }
     }

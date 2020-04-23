@@ -86,6 +86,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp" />
+
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
@@ -150,6 +151,17 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:id="@+id/bpTempCorrelationTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/bpTempChart"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="16sp"
+                    android:textAllCaps="false"/>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
@@ -182,6 +194,17 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:id="@+id/bpPressureCorrelationTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/bpPressureChart"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="16sp"
+                    android:textAllCaps="false"/>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
@@ -214,6 +237,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp" />
+
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 

@@ -351,7 +351,24 @@ public class ProfileFragment extends Fragment {
         currentUserProfile.setDiseases(diseasesMap);
         currentUserProfile.setSmoker(smokerCb.isChecked());
         currentUserProfile.setPregnant(pregnantCb.isChecked());
-        databaseReference.child("user-profile").child(emailAddress).setValue(currentUserProfile);
+        Query getUserProfileByEmail = databaseReference.child("user-profile").orderByChild("emailAddress").equalTo(emailAddress);
+        getUserProfileByEmail.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        if(snapshot.getKey() != null){
+                            databaseReference.child("user-profile").child(snapshot.getKey()).setValue(currentUserProfile);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {

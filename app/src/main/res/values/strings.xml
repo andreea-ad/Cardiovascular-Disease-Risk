@@ -48,18 +48,19 @@
     <string name="cholesterol_dash_ro">Colesterol</string>
     <string name="bpm">bpm</string>
     <string name="mmhg">mmHg</string>
-    <string name="weekly_ro">Săptămână</string>
-    <string name="monthly_ro">Lună</string>
-    <string name="yearly_ro">An</string>
+    <string name="last_week_ro">Ultima\nsăptămână</string>
+    <string name="last_month_ro">Ultima\nlună</string>
+    <string name="last_year_ro">Ultimul\nan</string>
     <string name="maximum_systolic_bp">Sistolic maxim</string>
     <string name="maximum_diastolic_bp">Diastolic maxim</string>
     <string name="value_ro">Valoare</string>
     <string name="save_ro">Salvează</string>
     <string name="bp_ro">Tensiunea arterială</string>
     <string name="the_pulse_ro">Pulsul</string>
-    <string name="bp_temp_ro">Tensiune arterială - Temperatură</string>
-    <string name="bp_pressure_ro">Tensiune arterială - Presiune atmosferică</string>
-    <string name="bp_bmi_ro">Tensiune arterială - Indice de masă corporală</string>
+    <string name="bp_temp_ro">Tensiune arterială - temperatură</string>
+    <string name="bp_pressure_ro">Tensiune arterială - presiune atmosferică</string>
+    <string name="bp_humidity_ro">Tensiune arterială - umiditate</string>
+    <string name="bp_windspeed_ro">Tensiune arterială - viteza vântului</string>
     <string name="bp_stages_ro">Stadiile de hipertensiune</string>
     <string name="city_ro">Oraș</string>
     <string name="edit_profile_ro">Editează profil</string>
@@ -74,4 +75,5 @@
     <string name="pressure_ro">Presiune:</string>
     <string name="nebulosity_ro">Nebulozitate:</string>
     <string name="logout_ro">Deconectare</string>
+    <string name="correlation_coefficient_ro">Coeficientul de corelație</string>
 </resources>

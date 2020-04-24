@@ -143,7 +143,6 @@ public class HistoryFragment extends Fragment {
                 }
             });
 
-
         }
 
         return v;
@@ -275,8 +274,10 @@ public class HistoryFragment extends Fragment {
                         WeatherRecord weatherRecord = snapshot.getValue(WeatherRecord.class);
                         if (weatherRecord != null) {
                             allWeatherRecordsByCity.add(weatherRecord);
+                            Log.d(TAG, "W: " + weatherRecord);
                         }
                     }
+
                     //FILTER WEATHER RECORDs
                     for (CardioRecord c : allCardioRecordsByUser) {
                         for (WeatherRecord w : allWeatherRecordsByCity) {

@@ -27,7 +27,7 @@
                 android:checked="true"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="@string/weekly_ro"
+                android:text="@string/last_week_ro"
                 android:textColor="@drawable/radio_text" />
 
             <RadioButton
@@ -40,7 +40,7 @@
                 android:button="@null"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="@string/monthly_ro"
+                android:text="@string/last_month_ro"
                 android:textColor="@drawable/radio_text" />
 
             <RadioButton
@@ -53,7 +53,7 @@
                 android:button="@null"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="@string/yearly_ro"
+                android:text="@string/last_year_ro"
                 android:textColor="@drawable/radio_text" />
         </RadioGroup>
 
@@ -75,6 +75,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:text="@string/bp_ro"
                     android:textSize="22sp" />
 
@@ -108,6 +109,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:text="@string/the_pulse_ro"
                     android:textSize="22sp" />
 
@@ -140,6 +142,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:text="@string/bp_temp_ro"
                     android:textSize="22sp" />
 
@@ -153,15 +156,26 @@
                     android:layout_marginBottom="20dp" />
 
                 <TextView
-                    android:id="@+id/bpTempCorrelationTv"
+                    android:id="@+id/correlationTv1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/bpTempChart"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="20dp"
                     android:textSize="16sp"
-                    android:textAllCaps="false"/>
+                    android:text="@string/correlation_coefficient_ro"/>
+
+                <TextView
+                    android:id="@+id/bpTempCorrelationTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/correlationTv1"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="12sp" />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
@@ -183,6 +197,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:text="@string/bp_pressure_ro"
                     android:textSize="22sp" />
 
@@ -196,47 +211,137 @@
                     android:layout_marginBottom="20dp" />
 
                 <TextView
-                    android:id="@+id/bpPressureCorrelationTv"
+                    android:id="@+id/correlationTv2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/bpPressureChart"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="20dp"
                     android:textSize="16sp"
-                    android:textAllCaps="false"/>
+                    android:text="@string/correlation_coefficient_ro"/>
+
+                <TextView
+                    android:id="@+id/bpPressureCorrelationTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/correlationTv2"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="12sp"/>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/bpBMIChartCv"
+            android:id="@+id/bpHumidityChartCv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="@dimen/cardview_corner_radius"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
-                android:id="@+id/bpBMIChartRl"
+                android:id="@+id/bpHumidityChartRl"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/bpBMIChartTv"
+                    android:id="@+id/bpHumidityChartTv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
-                    android:text="@string/bp_bmi_ro"
+                    android:layout_marginEnd="20dp"
+                    android:text="@string/bp_humidity_ro"
                     android:textSize="22sp" />
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/bpBMIChart"
+                    android:id="@+id/bpHumidityChart"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
-                    android:layout_below="@id/bpBMIChartTv"
+                    android:layout_below="@id/bpHumidityChartTv"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:id="@+id/correlationTv3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/bpHumidityChart"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="16sp"
+                    android:text="@string/correlation_coefficient_ro"/>
+
+                <TextView
+                    android:id="@+id/bpHumidityCorrelationTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/correlationTv3"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="12sp"/>
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bpWindSpeedCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/bpWindSpeedChartRl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bpWindSpeedChartTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:text="@string/bp_windspeed_ro"
+                    android:textSize="22sp" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/bpWindSpeedChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@id/bpWindSpeedChartTv"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:id="@+id/correlationTv4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/bpWindSpeedChart"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="16sp"
+                    android:text="@string/correlation_coefficient_ro"/>
+
+                <TextView
+                    android:id="@+id/bpWindSpeedCorrelationTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/correlationTv4"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="12sp"/>
 
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
@@ -259,6 +364,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
                     android:text="@string/bp_stages_ro"
                     android:textSize="22sp" />
 

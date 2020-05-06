@@ -376,6 +376,7 @@ public class CollectDataFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     int i = 0;
+                    medications = new String[MEDICATION_COUNT];
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Medication medication = snapshot.getValue(Medication.class);
                         if (medication != null && medication.getMedicationName() != null) {
@@ -479,6 +480,8 @@ public class CollectDataFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    selectedMedicationList = new ArrayList<>();
+                    selectedMedication = new HashMap<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         CardioRecord cardioRecord = snapshot.getValue(CardioRecord.class);
                         if (cardioRecord != null && cardioRecord.getMedication() != null) {
@@ -486,7 +489,7 @@ public class CollectDataFragment extends Fragment {
                             selectedMedicationList = new ArrayList<>(selectedMedication.values());
                             for (int i = 0; i < medications.length; i++) {
                                 if (selectedMedicationList.contains(medications[i])) {
-                                    Log.d(TAG, "Medication" + medications[i]);
+                                    Log.d(TAG, "Medication: " + medications[i]);
                                     checkedMedication[i] = true;
                                 }
                             }
@@ -524,23 +527,18 @@ public class CollectDataFragment extends Fragment {
             databaseReference = firebaseDatabase.getReference("cardio-record");
             String key = databaseReference.push().getKey();
             if (key != null) {
-                databaseReference.child(key).setValue(cardioRecordToRegister);
-            }
-
-            databaseReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Toast.makeText(getContext(), "Datele au fost înregistrate cu succes.", Toast.LENGTH_SHORT).show();
+                databaseReference.child(key).setValue(cardioRecordToRegister, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if(databaseError == null){
+                            Toast.makeText(getContext(), "Datele au fost înregistrate cu succes.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(getContext(), "Datele nu au putut fi înregistrate.", Toast.LENGTH_SHORT).show();
+                        }
+                        loadingDialog.dismissDialog();
                     }
-                    loadingDialog.dismissDialog();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    loadingDialog.dismissDialog();
-                }
-            });
+                });
+            }
         }
     }
 

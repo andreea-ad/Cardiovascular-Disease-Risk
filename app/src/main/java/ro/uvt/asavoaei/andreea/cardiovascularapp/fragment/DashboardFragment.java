@@ -39,6 +39,7 @@ import ro.uvt.asavoaei.andreea.cardiovascularapp.R;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.dialog.LoadingDialog;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.model.CardioRecord;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.model.UserProfile;
+import ro.uvt.asavoaei.andreea.cardiovascularapp.model.WeatherRecord;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.FloatValueFormatter;
 
 public class DashboardFragment extends Fragment {
@@ -78,10 +79,8 @@ public class DashboardFragment extends Fragment {
         systolicLc = view.findViewById(R.id.systolicLc);
         diastolicLc = view.findViewById(R.id.diastolicLc);
         if (firebaseAuth.getCurrentUser() != null) {
-
             emailAddress = firebaseAuth.getCurrentUser().getEmail();
             new PumpDataTask().execute();
-
         }
         return view;
     }
@@ -137,10 +136,11 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    systolicValues = new ArrayList<>();
+                    diastolicValues = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         CardioRecord cardioRecord = snapshot.getValue(CardioRecord.class);
                         if (cardioRecord != null) {
-                            Log.d(TAG, "Cardio: " + cardioRecord);
                             systolicValues.add(cardioRecord.getSystolicBP());
                             diastolicValues.add(cardioRecord.getDiastolicBP());
                         }

@@ -2,6 +2,7 @@ package ro.uvt.asavoaei.andreea.cardiovascularapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,12 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import ro.uvt.asavoaei.andreea.cardiovascularapp.R;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.dialog.InternetConnectionDialog;
@@ -20,6 +27,7 @@ import ro.uvt.asavoaei.andreea.cardiovascularapp.fragment.DashboardFragment;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.fragment.HistoryFragment;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.fragment.ProfileFragment;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.fragment.StatisticsFragment;
+import ro.uvt.asavoaei.andreea.cardiovascularapp.model.WeatherRecord;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = MainActivity.class.getSimpleName();

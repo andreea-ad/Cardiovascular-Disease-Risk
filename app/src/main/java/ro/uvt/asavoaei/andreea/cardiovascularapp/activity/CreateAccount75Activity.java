@@ -135,6 +135,7 @@ public class CreateAccount75Activity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     int i = 0;
+                    diseases = new String[DISEASES_COUNT];
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         diseases[i] = snapshot.getValue(Disease.class).getName();
                         Log.d(TAG, "Disease: " + diseases[i]);

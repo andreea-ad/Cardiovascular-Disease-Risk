@@ -144,8 +144,6 @@ public class CreateAccount50Activity extends AppCompatActivity {
 
         genderSpinnerAdapter.setDropDownViewResource(R.layout.custom_spinner_item_gender);
         genderSpinner.setAdapter(genderSpinnerAdapter);
-
-
     }
 
     @Override
@@ -167,8 +165,6 @@ public class CreateAccount50Activity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
     private void updateBirthday() {

@@ -50,7 +50,7 @@ public class HistoryFragment extends Fragment {
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
     private FirebaseAuth firebaseAuth;
     private RecyclerView historyRecyclerView;
-    private RadioButton recordingDateRb, bloodPressureRb, pulseRb, ascendingRb, descendingRb;
+    //private RadioButton recordingDateRb, bloodPressureRb, pulseRb, ascendingRb, descendingRb;
     private RadioGroup timeRg, sortRg;
     private LoadingDialog loadingDialog;
     private List<CardioAndWeatherRecord> cardioAndWeatherRecordList = new ArrayList<>();
@@ -73,11 +73,11 @@ public class HistoryFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_history, null);
         loadingDialog = new LoadingDialog(getContext());
         historyRecyclerView = v.findViewById(R.id.cardioHistoryRv);
-        recordingDateRb = v.findViewById(R.id.recordingDateRb);
-        bloodPressureRb = v.findViewById(R.id.bloodPressureRb);
-        pulseRb = v.findViewById(R.id.pulseRb);
-        ascendingRb = v.findViewById(R.id.sortAscendingRb);
-        descendingRb = v.findViewById(R.id.sortDescendingRb);
+//        recordingDateRb = v.findViewById(R.id.recordingDateRb);
+//        bloodPressureRb = v.findViewById(R.id.bloodPressureRb);
+//        pulseRb = v.findViewById(R.id.pulseRb);
+//        ascendingRb = v.findViewById(R.id.sortAscendingRb);
+//        descendingRb = v.findViewById(R.id.sortDescendingRb);
         timeRg = v.findViewById(R.id.timeRg);
         sortRg = v.findViewById(R.id.sortRg);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -142,7 +142,6 @@ public class HistoryFragment extends Fragment {
                     }
                 }
             });
-
 
         }
 
@@ -247,9 +246,11 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    allCardioRecordsByUser = new ArrayList<>();
                     for (final DataSnapshot cardio : dataSnapshot.getChildren()) {
                         CardioRecord cardioRecord = cardio.getValue(CardioRecord.class);
                         if (cardioRecord != null) {
+                            Log.d(TAG, "Car: " + cardioRecord);
                             allCardioRecordsByUser.add(cardioRecord);
                         }
                     }
@@ -271,13 +272,15 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    allWeatherRecordsByCity = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         WeatherRecord weatherRecord = snapshot.getValue(WeatherRecord.class);
                         if (weatherRecord != null) {
                             allWeatherRecordsByCity.add(weatherRecord);
                         }
                     }
-                    //FILTER WEATHER RECORDs
+                    filteredWeatherRecords = new HashSet<>();
+                    //FILTER WEATHER RECORDS
                     for (CardioRecord c : allCardioRecordsByUser) {
                         for (WeatherRecord w : allWeatherRecordsByCity) {
                             String recHourC = c.getRecordingHour().split(":")[0];
@@ -288,7 +291,6 @@ public class HistoryFragment extends Fragment {
                         }
                     }
                     concatenateLists();
-
                 }
             }
 

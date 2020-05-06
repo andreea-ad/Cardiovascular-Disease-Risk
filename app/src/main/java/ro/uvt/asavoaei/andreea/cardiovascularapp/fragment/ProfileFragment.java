@@ -241,7 +241,6 @@ public class ProfileFragment extends Fragment {
             diseasesRecyclerView.setAdapter(diseasesCustomAdapter);
         }
         loadingDialog.dismissDialog();
-
     }
 
     private void getDiseasesArray() {
@@ -251,6 +250,7 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     int i = 0;
+                    diseases = new String[DISEASES_COUNT];
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         diseases[i] = snapshot.getValue(Disease.class).getName();
                         Log.d(TAG, "Disease: " + diseases[i]);
@@ -294,6 +294,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    currentUserProfile = new UserProfile();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         UserProfile snapshotUser = snapshot.getValue(UserProfile.class);
                         if (snapshotUser != null) {

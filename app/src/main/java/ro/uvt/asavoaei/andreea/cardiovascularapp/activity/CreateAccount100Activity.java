@@ -117,22 +117,31 @@ public class CreateAccount100Activity extends AppCompatActivity {
         databaseReference = firebaseDatabase.getReference("user-profile");
         String key = databaseReference.push().getKey();
         if (key != null) {
-            databaseReference.child(key).setValue(userProfile);
+            databaseReference.child(key).setValue(userProfile, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if(databaseError == null){
+                        Toast.makeText(getApplicationContext(), "User profile successfully created.", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getApplicationContext(), "User profile could not be created.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Toast.makeText(getApplicationContext(), "User profile successfully created.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        databaseReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()) {
+//                    Toast.makeText(getApplicationContext(), "User profile successfully created.", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 }
 

@@ -25,19 +25,25 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -93,6 +99,11 @@ public class StatisticsFragment extends Fragment {
     private LocalDate currentDate = LocalDate.now();
     private int numberOfEntries = 7;
     private int numberOfLabels = numberOfEntries;
+    private int normalBp = 0;
+    private int elevatedBp = 0;
+    private int hypertensionStageI = 0;
+    private int hypertensionStageII = 0;
+    private int hypertensiveCrisis = 0;
 
     private Set<CardioRecord> cardioRecordSet = new HashSet<>();
     private Set<WeatherRecord> weatherRecordSet = new HashSet<>();
@@ -100,11 +111,15 @@ public class StatisticsFragment extends Fragment {
     private List<CardioRecord> cardioRecordList = new ArrayList<>();
     private List<WeatherRecord> weatherRecordList = new ArrayList<>();
 
+    private Map<String, Float> bpAveragesOnCategories = new HashMap();
+
     private ArrayList<ILineDataSet> iLineDataSets = new ArrayList<>();
     private LineData lineData;
+    private PieData pieData;
 
     private LineChart bloodPressureLc, pulseLc, bloodPressureAndTemperatureLc, bloodPressureAndPressureLc, bloodPressureAndHumidityLc, bloodPressureAndWindSpeedLc;
     private PieChart hypertensionStagesPc;
+
     private LineDataSet systolicBPDataSet = new LineDataSet(null, null);
     private LineDataSet diastolicBPDataSet = new LineDataSet(null, null);
     private LineDataSet pulseDataSet = new LineDataSet(null, null);
@@ -112,6 +127,7 @@ public class StatisticsFragment extends Fragment {
     private LineDataSet pressureDataSet = new LineDataSet(null, null);
     private LineDataSet humidityDataSet = new LineDataSet(null, null);
     private LineDataSet windSpeedDataSet = new LineDataSet(null,null);
+    private PieDataSet bloodPressurePieDataSet = new PieDataSet(null, null);
 
     private ArrayList<Entry> systolic = new ArrayList<>();
     private ArrayList<Entry> diastolic = new ArrayList<>();
@@ -120,6 +136,9 @@ public class StatisticsFragment extends Fragment {
     private ArrayList<Entry> pressure = new ArrayList<>();
     private ArrayList<Entry> humidity = new ArrayList<>();
     private ArrayList<Entry> windSpeed = new ArrayList<>();
+    private ArrayList<PieEntry> bloodPressurePieEntry = new ArrayList<>();
+
+
 
 
     @Nullable
@@ -136,7 +155,6 @@ public class StatisticsFragment extends Fragment {
         hypertensionStagesPc = view.findViewById(R.id.bpStagesChart);
 
         timeRg = view.findViewById(R.id.timeRg);
-
         bpTempCorrelationTv = view.findViewById(R.id.bpTempCorrelationTv);
         bpPressureCorrelationTv = view.findViewById(R.id.bpPressureCorrelationTv);
         bpHumidityCorrelationTv = view.findViewById(R.id.bpHumidityCorrelationTv);
@@ -208,6 +226,7 @@ public class StatisticsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    cardioRecordSet = new HashSet<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         CardioRecord cardioRecord = snapshot.getValue(CardioRecord.class);
                         if (cardioRecord != null) {
@@ -235,6 +254,7 @@ public class StatisticsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    weatherRecordSet = new HashSet<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         WeatherRecord weatherRecord = snapshot.getValue(WeatherRecord.class);
                         if (weatherRecord != null) {
@@ -301,14 +321,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void createEntryLists() {
-        systolic = new ArrayList<>();
-        diastolic = new ArrayList<>();
-        pulse = new ArrayList<>();
-
-        temperature = new ArrayList<>();
-        pressure = new ArrayList<>();
-        humidity = new ArrayList<>();
-        windSpeed = new ArrayList<>();
+        initializeUtils();
 
         for (CardioRecord c : cardioRecordList) {
             for (WeatherRecord w : weatherRecordList) {
@@ -333,12 +346,104 @@ public class StatisticsFragment extends Fragment {
                             diastolic.add(new Entry(timeMillis, c.getDiastolicBP()));
                             pulse.add(new Entry(timeMillis, c.getPulse()));
 
+                            //createPieEntryList(c);
+                            addBloodPressureToCategory(c);
+
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
+        }
+        computeAveragesForBloodPressure();
+        createEntryListForBPPieChart();
+    }
+
+    private void initializeUtils(){
+        systolic = new ArrayList<>();
+        diastolic = new ArrayList<>();
+        pulse = new ArrayList<>();
+
+        temperature = new ArrayList<>();
+        pressure = new ArrayList<>();
+        humidity = new ArrayList<>();
+        windSpeed = new ArrayList<>();
+
+        bloodPressurePieEntry = new ArrayList<>();
+        bpAveragesOnCategories = new HashMap<>();
+
+        normalBp = 0;
+        elevatedBp = 0;
+        hypertensionStageI = 0;
+        hypertensionStageII = 0;
+        hypertensiveCrisis = 0;
+
+        bpAveragesOnCategories.put("Normală", 0f);
+        bpAveragesOnCategories.put("Crescută", 0f);
+        bpAveragesOnCategories.put("Hipertensiune - stadiul I", 0f);
+        bpAveragesOnCategories.put("Hipertensiune - stadiul II", 0f);
+        bpAveragesOnCategories.put("Criză hipertensivă", 0f);
+
+    }
+
+    private void addBloodPressureToCategory(CardioRecord c){
+        if(c.getSystolicBP() < 120 && c.getDiastolicBP() < 80){
+            bpAveragesOnCategories.put("Normală", bpAveragesOnCategories.get("Normală") + c.getSystolicBP());
+            normalBp++;
+            Log.d(TAG, "Normala: " + c.getSystolicBP() + "." + c.getDiastolicBP());
+        }else if(c.getSystolicBP() >= 120 && c.getSystolicBP() <= 129 && c.getDiastolicBP() < 80){
+            bpAveragesOnCategories.put("Crescută", bpAveragesOnCategories.get("Crescută") + c.getSystolicBP());
+            elevatedBp++;
+            Log.d(TAG, "Crescuta: " + c.getSystolicBP() + "." + c.getDiastolicBP());
+        }else if((c.getSystolicBP() >= 130 && c.getSystolicBP() <= 139) || (c.getDiastolicBP() >= 80 && c.getDiastolicBP() <= 89)){
+            bpAveragesOnCategories.put("Hipertensiune - stadiul I", bpAveragesOnCategories.get("Hipertensiune - stadiul I") + c.getSystolicBP());
+            hypertensionStageI++;
+            Log.d(TAG, "Hipertensiune - stadiul I: " + c.getSystolicBP() + "." + c.getDiastolicBP());
+        }else if(c.getSystolicBP() >= 140 || c.getDiastolicBP() >= 90){
+            bpAveragesOnCategories.put("Hipertensiune - stadiul II", bpAveragesOnCategories.get("Hipertensiune - stadiul II") + c.getSystolicBP());
+            hypertensionStageII++;
+            Log.d(TAG, "Hipertensiune - stadiul II: " + c.getSystolicBP() + "." + c.getDiastolicBP());
+        }else if(c.getSystolicBP() > 180 || c.getDiastolicBP() > 120){
+            bpAveragesOnCategories.put("Criză hipertensivă", bpAveragesOnCategories.get("Criză hipertensivă") + c.getSystolicBP());
+            hypertensiveCrisis++;
+            Log.d(TAG, "Criza hipertensiva: " + c.getSystolicBP() + "." + c.getDiastolicBP());
+        }
+    }
+
+    private void computeAveragesForBloodPressure(){
+        Log.d(TAG, "Before average: " + bpAveragesOnCategories);
+        for(String category : bpAveragesOnCategories.keySet()){
+            if(category.equals("Normală") && normalBp > 0) {
+                bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / normalBp);
+            }else if(category.equals("Crescută") && elevatedBp > 0){
+                bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / elevatedBp);
+            }else if(category.equals("Hipertensiune - stadiul I") && hypertensionStageI > 0){
+                bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / hypertensionStageI);
+            }else if(category.equals("Hipertensiune - stadiul II") && hypertensionStageII > 0){
+                bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / hypertensionStageII);
+            }else if(category.equals("Criza hipertensivă") && hypertensiveCrisis > 0){
+                bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / hypertensiveCrisis);
+            }
+        }
+        Log.d(TAG, "After average: " + bpAveragesOnCategories);
+    }
+
+    private void createEntryListForBPPieChart(){
+        for(String category : bpAveragesOnCategories.keySet()){
+            if(category.equals("Normală") && normalBp > 0) {
+                bloodPressurePieEntry.add(new PieEntry(normalBp, category));
+            }else if(category.equals("Crescută") && elevatedBp > 0){
+                bloodPressurePieEntry.add(new PieEntry(elevatedBp, category));
+            }else if(category.equals("Hipertensiune - stadiul I") && hypertensionStageI > 0){
+                bloodPressurePieEntry.add(new PieEntry(hypertensionStageI, category));
+            }else if(category.equals("Hipertensiune - stadiul II") && hypertensionStageII > 0){
+                bloodPressurePieEntry.add(new PieEntry(hypertensionStageII, category));
+            }else if(category.equals("Criza hipertensivă") && hypertensiveCrisis > 0){
+                bloodPressurePieEntry.add(new PieEntry(hypertensiveCrisis, category));
+            }
+            //bloodPressurePieEntry.add(new PieEntry(bpAveragesOnCategories.get(category), category));
         }
     }
 
@@ -489,14 +594,14 @@ public class StatisticsFragment extends Fragment {
         bloodPressureLc.invalidate();
         bloodPressureLc.setMaxVisibleValueCount(numberOfEntries);
 
-        XAxis xAxisSystolic;
+        XAxis xAxis;
         {
-            xAxisSystolic = bloodPressureLc.getXAxis();
-            xAxisSystolic.resetAxisMaximum();
-            xAxisSystolic.resetAxisMinimum();
-            xAxisSystolic.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxisSystolic.setLabelCount(systolic.size(), true);
-            xAxisSystolic.setValueFormatter(new ValueFormatter() {
+            xAxis = bloodPressureLc.getXAxis();
+            xAxis.resetAxisMaximum();
+            xAxis.resetAxisMinimum();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setLabelCount(systolic.size(), true);
+            xAxis.setValueFormatter(new ValueFormatter() {
                 private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM");
 
                 @Override
@@ -506,17 +611,47 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                xAxisSystolic.setLabelCount(numberOfLabels);
+                xAxis.setLabelCount(numberOfLabels);
             }
         }
 
-        YAxis yAxisSystolic;
+        YAxis yAxis;
         {
-            yAxisSystolic = bloodPressureLc.getAxisLeft();
+            yAxis = bloodPressureLc.getAxisLeft();
             bloodPressureLc.getAxisRight().setEnabled(false);
-            yAxisSystolic.disableAxisLineDashedLine();
-            yAxisSystolic.resetAxisMaximum();
-            yAxisSystolic.resetAxisMinimum();
+            yAxis.disableAxisLineDashedLine();
+            yAxis.resetAxisMaximum();
+            yAxis.resetAxisMinimum();
+
+            LimitLine normalBloodPressure = new LimitLine(70, "TA sistolică normală");
+            normalBloodPressure.setLineColor(ContextCompat.getColor(getContext(), R.color.normalBP));
+            normalBloodPressure.setLineWidth(2f);
+            normalBloodPressure.setTextColor(ContextCompat.getColor(getContext(), R.color.normalBP));
+            yAxis.addLimitLine(normalBloodPressure);
+
+            LimitLine elevatedBloodPressure = new LimitLine(120, "TA sistolică crescută");
+            elevatedBloodPressure.setLineColor(ContextCompat.getColor(getContext(), R.color.elevatedBP));
+            elevatedBloodPressure.setLineWidth(2f);
+            elevatedBloodPressure.setTextColor(ContextCompat.getColor(getContext(), R.color.elevatedBP));
+            yAxis.addLimitLine(elevatedBloodPressure);
+
+            LimitLine hypertensionStage1 = new LimitLine(130, "Hipertensiune - stadiul I");
+            hypertensionStage1.setLineColor(ContextCompat.getColor(getContext(), R.color.hypertensionStageI));
+            hypertensionStage1.setLineWidth(2f);
+            hypertensionStage1.setTextColor(ContextCompat.getColor(getContext(), R.color.hypertensionStageI));
+            yAxis.addLimitLine(hypertensionStage1);
+
+            LimitLine hypertensionStage2 = new LimitLine(140, "Hipertensiune - stadiul II");
+            hypertensionStage2.setLineColor(ContextCompat.getColor(getContext(), R.color.hypertensionStageII));
+            hypertensionStage2.setLineWidth(2f);
+            hypertensionStage2.setTextColor(ContextCompat.getColor(getContext(), R.color.hypertensionStageII));
+            yAxis.addLimitLine(hypertensionStage2);
+
+            LimitLine hypertensiveCrisis = new LimitLine(180, "Criză hipertensivă");
+            hypertensiveCrisis.setLineColor(ContextCompat.getColor(getContext(), R.color.hypertensiveCrisis));
+            hypertensiveCrisis.setLineWidth(2f);
+            hypertensiveCrisis.setTextColor(ContextCompat.getColor(getContext(), R.color.hypertensiveCrisis));
+            yAxis.addLimitLine(hypertensiveCrisis);
         }
 
         Legend legend = bloodPressureLc.getLegend();
@@ -525,7 +660,6 @@ public class StatisticsFragment extends Fragment {
         BloodPressureMarkerView mv = new BloodPressureMarkerView(getContext(), R.layout.custom_markerview_cardio);
         mv.setChartView(bloodPressureLc);
         bloodPressureLc.setMarker(mv);
-
     }
 
 
@@ -570,14 +704,14 @@ public class StatisticsFragment extends Fragment {
         pulseLc.invalidate();
         pulseLc.setMaxVisibleValueCount(numberOfEntries);
 
-        XAxis xAxisSystolic;
+        XAxis xAxis;
         {
-            xAxisSystolic = pulseLc.getXAxis();
-            xAxisSystolic.resetAxisMaximum();
-            xAxisSystolic.resetAxisMinimum();
-            xAxisSystolic.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxisSystolic.setLabelCount(systolic.size(), true);
-            xAxisSystolic.setValueFormatter(new ValueFormatter() {
+            xAxis = pulseLc.getXAxis();
+            xAxis.resetAxisMaximum();
+            xAxis.resetAxisMinimum();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setLabelCount(systolic.size(), true);
+            xAxis.setValueFormatter(new ValueFormatter() {
                 private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM");
 
                 @Override
@@ -595,17 +729,17 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                xAxisSystolic.setLabelCount(numberOfLabels);
+                xAxis.setLabelCount(numberOfLabels);
             }
         }
 
-        YAxis yAxisSystolic;
+        YAxis yAxis;
         {
-            yAxisSystolic = pulseLc.getAxisLeft();
+            yAxis = pulseLc.getAxisLeft();
             pulseLc.getAxisRight().setEnabled(false);
-            yAxisSystolic.disableAxisLineDashedLine();
-            yAxisSystolic.resetAxisMaximum();
-            yAxisSystolic.resetAxisMinimum();
+            yAxis.disableAxisLineDashedLine();
+            yAxis.resetAxisMaximum();
+            yAxis.resetAxisMinimum();
         }
 
         Legend legend = pulseLc.getLegend();
@@ -614,7 +748,6 @@ public class StatisticsFragment extends Fragment {
         PulseMarkerView mv = new PulseMarkerView(getContext(), R.layout.custom_markerview_cardio);
         mv.setChartView(pulseLc);
         pulseLc.setMarker(mv);
-
     }
 
     private void showChartBloodPressureAndTemperature() {
@@ -708,14 +841,14 @@ public class StatisticsFragment extends Fragment {
         bloodPressureAndTemperatureLc.invalidate();
         bloodPressureAndTemperatureLc.setMaxVisibleValueCount(numberOfEntries);
 
-        XAxis xAxisSystolic;
+        XAxis xAxis;
         {
-            xAxisSystolic = bloodPressureAndTemperatureLc.getXAxis();
-            xAxisSystolic.resetAxisMaximum();
-            xAxisSystolic.resetAxisMinimum();
-            xAxisSystolic.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxisSystolic.setLabelCount(systolic.size(), true);
-            xAxisSystolic.setValueFormatter(new ValueFormatter() {
+            xAxis = bloodPressureAndTemperatureLc.getXAxis();
+            xAxis.resetAxisMaximum();
+            xAxis.resetAxisMinimum();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setLabelCount(systolic.size(), true);
+            xAxis.setValueFormatter(new ValueFormatter() {
                 private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM");
 
                 @Override
@@ -725,17 +858,17 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                xAxisSystolic.setLabelCount(numberOfLabels);
+                xAxis.setLabelCount(numberOfLabels);
             }
         }
 
-        YAxis yAxisSystolic;
+        YAxis yAxis;
         {
-            yAxisSystolic = bloodPressureAndTemperatureLc.getAxisLeft();
+            yAxis = bloodPressureAndTemperatureLc.getAxisLeft();
             bloodPressureAndTemperatureLc.getAxisRight().setEnabled(false);
-            yAxisSystolic.disableAxisLineDashedLine();
-            yAxisSystolic.resetAxisMaximum();
-            yAxisSystolic.resetAxisMinimum();
+            yAxis.disableAxisLineDashedLine();
+            yAxis.resetAxisMaximum();
+            yAxis.resetAxisMinimum();
         }
 
         Legend legend = bloodPressureAndTemperatureLc.getLegend();
@@ -831,14 +964,14 @@ public class StatisticsFragment extends Fragment {
         bloodPressureAndPressureLc.invalidate();
         bloodPressureAndPressureLc.setMaxVisibleValueCount(numberOfEntries);
 
-        XAxis xAxisSystolic;
+        XAxis xAxis;
         {
-            xAxisSystolic = bloodPressureAndPressureLc.getXAxis();
-            xAxisSystolic.resetAxisMaximum();
-            xAxisSystolic.resetAxisMinimum();
-            xAxisSystolic.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxisSystolic.setLabelCount(systolic.size(), true);
-            xAxisSystolic.setValueFormatter(new ValueFormatter() {
+            xAxis = bloodPressureAndPressureLc.getXAxis();
+            xAxis.resetAxisMaximum();
+            xAxis.resetAxisMinimum();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setLabelCount(systolic.size(), true);
+            xAxis.setValueFormatter(new ValueFormatter() {
                 private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM");
 
                 @Override
@@ -849,17 +982,17 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                xAxisSystolic.setLabelCount(numberOfLabels);
+                xAxis.setLabelCount(numberOfLabels);
             }
         }
 
-        YAxis yAxisSystolic;
+        YAxis yAxis;
         {
-            yAxisSystolic = bloodPressureAndPressureLc.getAxisLeft();
+            yAxis = bloodPressureAndPressureLc.getAxisLeft();
             bloodPressureAndPressureLc.getAxisRight().setEnabled(false);
-            yAxisSystolic.disableAxisLineDashedLine();
-            yAxisSystolic.resetAxisMaximum();
-            yAxisSystolic.resetAxisMinimum();
+            yAxis.disableAxisLineDashedLine();
+            yAxis.resetAxisMaximum();
+            yAxis.resetAxisMinimum();
         }
 
         Legend legend = bloodPressureAndPressureLc.getLegend();
@@ -868,7 +1001,6 @@ public class StatisticsFragment extends Fragment {
         BloodPressureAndPressureMarkerView mv = new BloodPressureAndPressureMarkerView(getContext(), R.layout.custom_markerview_cardio);
         mv.setChartView(bloodPressureAndPressureLc);
         bloodPressureAndPressureLc.setMarker(mv);
-
     }
 
     private void showChartBloodPressureAndHumidity() {
@@ -962,14 +1094,14 @@ public class StatisticsFragment extends Fragment {
         bloodPressureAndHumidityLc.invalidate();
         bloodPressureAndHumidityLc.setMaxVisibleValueCount(numberOfEntries);
 
-        XAxis xAxisSystolic;
+        XAxis xAxis;
         {
-            xAxisSystolic = bloodPressureAndHumidityLc.getXAxis();
-            xAxisSystolic.resetAxisMaximum();
-            xAxisSystolic.resetAxisMinimum();
-            xAxisSystolic.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxisSystolic.setLabelCount(systolic.size(), true);
-            xAxisSystolic.setValueFormatter(new ValueFormatter() {
+            xAxis = bloodPressureAndHumidityLc.getXAxis();
+            xAxis.resetAxisMaximum();
+            xAxis.resetAxisMinimum();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setLabelCount(systolic.size(), true);
+            xAxis.setValueFormatter(new ValueFormatter() {
                 private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM");
 
                 @Override
@@ -979,17 +1111,17 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                xAxisSystolic.setLabelCount(numberOfLabels);
+                xAxis.setLabelCount(numberOfLabels);
             }
         }
 
-        YAxis yAxisSystolic;
+        YAxis yAxis;
         {
-            yAxisSystolic = bloodPressureAndHumidityLc.getAxisLeft();
+            yAxis = bloodPressureAndHumidityLc.getAxisLeft();
             bloodPressureAndHumidityLc.getAxisRight().setEnabled(false);
-            yAxisSystolic.disableAxisLineDashedLine();
-            yAxisSystolic.resetAxisMaximum();
-            yAxisSystolic.resetAxisMinimum();
+            yAxis.disableAxisLineDashedLine();
+            yAxis.resetAxisMaximum();
+            yAxis.resetAxisMinimum();
         }
 
         Legend legend = bloodPressureAndHumidityLc.getLegend();
@@ -1091,14 +1223,14 @@ public class StatisticsFragment extends Fragment {
         bloodPressureAndWindSpeedLc.invalidate();
         bloodPressureAndWindSpeedLc.setMaxVisibleValueCount(numberOfEntries);
 
-        XAxis xAxisSystolic;
+        XAxis xAxis;
         {
-            xAxisSystolic = bloodPressureAndWindSpeedLc.getXAxis();
-            xAxisSystolic.resetAxisMaximum();
-            xAxisSystolic.resetAxisMinimum();
-            xAxisSystolic.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxisSystolic.setLabelCount(systolic.size(), true);
-            xAxisSystolic.setValueFormatter(new ValueFormatter() {
+            xAxis = bloodPressureAndWindSpeedLc.getXAxis();
+            xAxis.resetAxisMaximum();
+            xAxis.resetAxisMinimum();
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setLabelCount(systolic.size(), true);
+            xAxis.setValueFormatter(new ValueFormatter() {
                 private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM");
 
                 @Override
@@ -1108,17 +1240,17 @@ public class StatisticsFragment extends Fragment {
                 }
             });
             if (numberOfEntries > 8) {
-                xAxisSystolic.setLabelCount(numberOfLabels);
+                xAxis.setLabelCount(numberOfLabels);
             }
         }
 
-        YAxis yAxisSystolic;
+        YAxis yAxis;
         {
-            yAxisSystolic = bloodPressureAndWindSpeedLc.getAxisLeft();
+            yAxis = bloodPressureAndWindSpeedLc.getAxisLeft();
             bloodPressureAndWindSpeedLc.getAxisRight().setEnabled(false);
-            yAxisSystolic.disableAxisLineDashedLine();
-            yAxisSystolic.resetAxisMaximum();
-            yAxisSystolic.resetAxisMinimum();
+            yAxis.disableAxisLineDashedLine();
+            yAxis.resetAxisMaximum();
+            yAxis.resetAxisMinimum();
         }
 
         Legend legend = bloodPressureAndWindSpeedLc.getLegend();
@@ -1130,6 +1262,46 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void showChartHypertensionStages() {
+        ArrayList<Integer> colors = new ArrayList<>();
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+
+        bloodPressurePieDataSet.setValues(bloodPressurePieEntry);
+        bloodPressurePieDataSet.setDrawIcons(false);
+        bloodPressurePieDataSet.setSliceSpace(3f);
+        bloodPressurePieDataSet.setIconsOffset(new MPPointF(0, 40));
+        bloodPressurePieDataSet.setSelectionShift(5f);
+        bloodPressurePieDataSet.setColors(colors);
+
+        pieData = new PieData(bloodPressurePieDataSet);
+        pieData.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return (int)value + "%";
+            }
+        });
+        pieData.setValueTextSize(15f);
+        pieData.setValueTextColor(Color.WHITE);
+        pieData.setDrawValues(true);
+
+        hypertensionStagesPc.setEntryLabelColor(Color.BLACK);
+        hypertensionStagesPc.getDescription().setEnabled(false);
+        hypertensionStagesPc.setUsePercentValues(true);
+
+        Legend legend = hypertensionStagesPc.getLegend();
+        legend.setOrientation(Legend.LegendOrientation.VERTICAL);
+        legend.setWordWrapEnabled(true);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        legend.setDrawInside(false);
+        legend.setXEntrySpace(7f);
+        legend.setYEntrySpace(0f);
+        legend.setYOffset(0f);
+
+        hypertensionStagesPc.setDrawEntryLabels(false);
+        hypertensionStagesPc.setData(pieData);
+        hypertensionStagesPc.highlightValues(null);
+        hypertensionStagesPc.invalidate();
 
     }
 
@@ -1141,7 +1313,7 @@ public class StatisticsFragment extends Fragment {
             showChartBloodPressureAndPressure();
             showChartBloodPressureAndHumidity();
             showChartBloodPressureAndWindSpeed();
-
+            showChartHypertensionStages();
         }
         loadingDialog.dismissDialog();
     }

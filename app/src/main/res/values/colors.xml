@@ -5,4 +5,9 @@
     <color name="colorAccent">#5dd64d</color>
     <color name="defaultGreyColor">#9c9c9c</color>
     <color name="customBackgroundColor">#ededed</color>
+    <color name="normalBP">#55cc00</color>
+    <color name="elevatedBP">#dede3c</color>
+    <color name="hypertensionStageI">#ffbf00</color>
+    <color name="hypertensionStageII">#e86500</color>
+    <color name="hypertensiveCrisis">#b80000</color>
 </resources>

@@ -371,8 +371,9 @@
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/bpStagesChart"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="450dp"
                     android:layout_below="@id/bpStagesChartTv"
+                    android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp" />

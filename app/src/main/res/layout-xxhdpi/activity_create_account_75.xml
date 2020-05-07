@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <antonkozyriatskyi.circularprogressindicator.CircularProgressIndicator
+        android:id="@+id/createAccountHeaderCpi"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="70dp"
+        android:layout_centerHorizontal="true"
+        app:direction="clockwise"
+        app:dotColor="@color/colorAccent"
+        app:dotWidth="16dp"
+        app:drawDot="true"
+        app:enableProgressAnimation="true"
+        app:fillBackground="false"
+        app:formattingPattern="75"
+        app:gradientEndColor="@color/colorPrimary"
+        app:gradientType="linear"
+        app:progressBackgroundColor="@color/defaultGreyColor"
+        app:progressBackgroundStrokeWidth="8dp"
+        app:progressCap="round"
+        app:progressColor="@color/colorPrimary"
+        app:progressStrokeWidth="8dp"
+        app:startAngle="270"
+        app:textColor="@color/colorPrimary"
+        app:textSize="30sp" />
+
+    <RelativeLayout
+        android:id="@+id/createAccountRl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createAccountHeaderCpi"
+        android:layout_marginTop="50dp">
+
+        <Button
+            android:id="@+id/addDiseaseBtn"
+            android:layout_width="130dp"
+            android:layout_height="30dp"
+            android:layout_alignStart="@id/diseasesCv"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/default_button"
+            android:text="@string/modify_ro"
+            android:textColor="#FFFFFF" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/diseasesCv"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addDiseaseBtn"
+            android:layout_centerHorizontal="true"
+            app:cardCornerRadius="@dimen/cardview_corner_radius"
+            app:cardUseCompatPadding="true">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/diseasesRv"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_margin="@dimen/default_layout_margin" />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNext100"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/createAccountRl"
+        android:layout_alignEnd="@id/createAccountRl"
+        android:layout_marginTop="165dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_keyboard_arrow_right_white_24dp" />
+</RelativeLayout>

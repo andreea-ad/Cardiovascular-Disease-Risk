@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/dataLl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/removeAccountIv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="20dp"
+            android:background="@drawable/ic_clear_black_24dp"
+            android:clickable="true"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/avatarIv"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/myshape"
+            android:src="@drawable/avatar2" />
+
+        <EditText
+            android:id="@+id/nameEt"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent"
+            android:textAlignment="center"
+            android:textColor="@color/defaultGreyColor"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/genderAgeTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/defaultGreyColor"
+            android:textSize="18sp" />
+
+        <RelativeLayout
+            android:id="@+id/profileData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/emailCv"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="19dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_email_black_24dp" />
+
+                <RelativeLayout
+                    android:id="@+id/emailRl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="55dp">
+
+                    <EditText
+                        android:id="@+id/emailEt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/default_layout_margin"
+                        android:background="@android:color/transparent"
+                        android:drawablePadding="30dp"
+                        android:hint="@string/email_ro"
+                        android:inputType="textEmailAddress" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/dobCv"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/emailCv"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="19dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_cake_black_24dp" />
+
+                <RelativeLayout
+                    android:id="@+id/dobRl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="55dp">
+
+                    <EditText
+                        android:id="@+id/dobEt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/default_layout_margin"
+                        android:background="@android:color/transparent"
+                        android:drawablePadding="30dp"
+                        android:hint="@string/date_of_birth_ro" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cityCv"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dobCv"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="19dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_place_black_24dp" />
+
+                <RelativeLayout
+                    android:id="@+id/cityRl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="55dp">
+
+                    <EditText
+                        android:id="@+id/cityEt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/default_layout_margin"
+                        android:background="@android:color/transparent"
+                        android:drawablePadding="30dp"
+                        android:hint="@string/city_ro" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/heightCv"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cityCv"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="19dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ruler" />
+
+                <RelativeLayout
+                    android:id="@+id/heightRl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="55dp">
+
+                    <EditText
+                        android:id="@+id/heightEt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/default_layout_margin"
+                        android:background="@android:color/transparent"
+                        android:drawablePadding="30dp"
+                        android:hint="@string/height_ro" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/diseasesCv"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/heightCv"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="@dimen/cardview_corner_radius"
+                app:cardUseCompatPadding="true">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/diseasesRv"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_margin="@dimen/default_layout_margin"
+                    android:clickable="false" />
+
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/addDiseaseBtn"
+                android:layout_width="130dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/diseasesCv"
+                android:layout_alignEnd="@id/diseasesCv"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/default_button"
+                android:text="@string/modify_ro"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+
+            <CheckBox
+                android:id="@+id/smokerCb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/addDiseaseBtn"
+                android:layout_marginStart="50dp"
+                android:clickable="false"
+                android:text="@string/smoker_ro"
+                android:textColor="@color/defaultGreyColor" />
+
+            <CheckBox
+                android:id="@+id/pregnantCb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/smokerCb"
+                android:layout_marginStart="50dp"
+                android:clickable="false"
+                android:text="@string/pregnant_ro"
+                android:textColor="@color/defaultGreyColor" />
+
+            <Button
+                android:id="@+id/editProfileBtn"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pregnantCb"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="50dp"
+                android:background="@drawable/default_button"
+                android:text="@string/edit_profile_ro"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/saveBtn"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pregnantCb"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="50dp"
+                android:background="@drawable/default_button"
+                android:text="@string/save_ro"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/logoutBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/pregnantCb"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="70dp"
+                android:background="@android:color/transparent"
+                android:text="@string/logout_ro"
+                android:textColor="@color/defaultGreyColor"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>

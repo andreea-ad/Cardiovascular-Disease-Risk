@@ -158,11 +158,11 @@ public class ProfileFragment extends Fragment {
                                                                     public void onComplete(@NonNull Task<Void> task) {
                                                                         if (task.isSuccessful()) {
                                                                             snapshot.getRef().removeValue();
-                                                                            Toast.makeText(getContext(), "Your account has been removed.", Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(getContext(), "Contul dvs. a fost eliminat.", Toast.LENGTH_SHORT).show();
                                                                             Intent loginActivity = new Intent(getContext(), LoginActivity.class);
                                                                             startActivity(loginActivity);
                                                                         } else {
-                                                                            Toast.makeText(getContext(), "Your account cannot be removed.", Toast.LENGTH_SHORT).show();
+                                                                            Toast.makeText(getContext(), "Contul dvs. nu poate fi eliminat.", Toast.LENGTH_SHORT).show();
                                                                         }
                                                                     }
                                                                 });

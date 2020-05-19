@@ -379,5 +379,15 @@
                     android:layout_marginBottom="20dp" />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/linearRegressionBtn"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/default_button"
+            android:text="@string/linear_regression_ro"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 </ScrollView>

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:text="Informatii statistice"
+        android:text="@string/statistics_ro"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="22sp"

@@ -101,6 +101,8 @@ import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.PulseMarkerView;
 import weka.classifiers.Evaluation;
 import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.functions.SMOreg;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -113,13 +115,16 @@ import weka.filters.unsupervised.attribute.Remove;
 public class StatisticsFragment extends Fragment {
     private static final String TAG = StatisticsFragment.class.getName();
     private static final String dateFormat = "dd-MM-yyyy";
+    private static final int LINEAR_REGRESSION = 1;
+    private static final int MULTILAYER_PERCEPTRON = 2;
+    private static final int SMO_REG = 3;
     private LoadingDialog loadingDialog;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
     private TextView bpTempCorrelationTv, bpPressureCorrelationTv, bpHumidityCorrelationTv, bpWindSpeedCorrelationTv;
     private RadioGroup timeRg;
-    private Button linearRegressionBtn;
+    private Button linearRegressionBtn, multilayerPerceptronBtn, SMORegBtn;
     private String emailAddress = "", city = "";
     private int height = 0;
     private Date startingDate;
@@ -192,6 +197,9 @@ public class StatisticsFragment extends Fragment {
         bpPressureCorrelationTv = view.findViewById(R.id.bpPressureCorrelationTv);
         bpHumidityCorrelationTv = view.findViewById(R.id.bpHumidityCorrelationTv);
         bpWindSpeedCorrelationTv = view.findViewById(R.id.bpWindSpeedCorrelationTv);
+        linearRegressionBtn = view.findViewById(R.id.linearRegressionBtn);
+        multilayerPerceptronBtn = view.findViewById(R.id.multilayerPerceptronBtn);
+        SMORegBtn = view.findViewById(R.id.SMORegBtn);
 
         attributeList.add(temperatureAttribute);
         attributeList.add(pressureAttribute);
@@ -199,77 +207,26 @@ public class StatisticsFragment extends Fragment {
         attributeList.add(systolicBloodPressureAttribute);
         attributeList.add(diastolicBloodPressureAttribute);
         attributeList.add(pulseAttribute);
-        linearRegressionBtn = view.findViewById(R.id.linearRegressionBtn);
+
         linearRegressionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new GetWeather().execute();
-                String[] predictorVariables = new String[]{"Temperatură", "Presiune atmosferică", "Umiditate"};
-                String[] predictedVariables = new String[]{"Tensiune arterială sistolică", "Tensiune arterială diastolică", "Puls"};
-                List<String> selectedPredictors = new ArrayList<>();
-                boolean[] checkedPredictors = new boolean[predictorVariables.length];
+                displayVariablesPickers(v.getId());
+            }
+        });
 
-                AlertDialog.Builder predictorsPicker = new AlertDialog.Builder(getActivity());
-                predictorsPicker.setTitle("Alegeți variabilele predictori");
-                predictorsPicker.setMultiChoiceItems(predictorVariables, checkedPredictors, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        checkedPredictors[which] = isChecked;
-                        selectedPredictors.add(predictorVariables[which]);
-                    }
-                });
-                predictorsPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final int[] checkedPredicted = {-1};
-                        AlertDialog.Builder predictedPicker = new AlertDialog.Builder(getContext());
-                        predictedPicker.setTitle("Alegeți variabilele prezise");
-                        predictedPicker.setSingleChoiceItems(predictedVariables, checkedPredicted[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                checkedPredicted[0] = which;
-                            }
-                        });
-                        predictedPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                boolean[] checked = new boolean[6];
-                                for(String selectedPredictor : selectedPredictors){
-                                    if(selectedPredictor.equals("Temperatură")){
-                                        checked[0] = true;
-                                    }else if(selectedPredictor.equals("Presiune atmosferică")){
-                                        checked[1] = true;
-                                    }else if(selectedPredictor.equals("Umiditate")){
-                                        checked[2] = true;
-                                    }
-                                }
-                                String predictedVariableString = predictedVariables[checkedPredicted[0]];
-                                if(predictedVariableString.equals("Tensiune arterială sistolică")){
-                                    checked[3] = true;
-                                }else if(predictedVariableString.equals("Tensiune arterială diastolică")){
-                                    checked[4] = true;
-                                }else if(predictedVariableString.equals("Puls")){
-                                    checked[5] = true;
-                                }
-                                trainDataSet(checked);
-                            }
-                        });
-                        predictedPicker.setNegativeButton("Anulează", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                predictedPicker.create().dismiss();
-                            }
-                        });
-                        predictedPicker.create().show();
-                    }
-                });
-                predictorsPicker.setNegativeButton("Anulează", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        predictorsPicker.create().dismiss();
-                    }
-                });
-                predictorsPicker.create().show();
+        multilayerPerceptronBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                displayVariablesPickers(v.getId());
+            }
+        });
+
+        SMORegBtn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                displayVariablesPickers(v.getId());
             }
         });
 
@@ -308,6 +265,86 @@ public class StatisticsFragment extends Fragment {
         return view;
     }
 
+    private void displayVariablesPickers(int viewId){
+        new GetWeather().execute();
+        String[] predictorVariables = new String[]{"Temperatură", "Presiune atmosferică", "Umiditate"};
+        String[] predictedVariables = new String[]{"Tensiune arterială sistolică", "Tensiune arterială diastolică", "Puls"};
+        List<String> selectedPredictors = new ArrayList<>();
+        boolean[] checkedPredictors = new boolean[predictorVariables.length];
+
+        AlertDialog.Builder predictorsPicker = new AlertDialog.Builder(getActivity());
+        predictorsPicker.setTitle("Alegeți variabilele predictori");
+        predictorsPicker.setMultiChoiceItems(predictorVariables, checkedPredictors, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                checkedPredictors[which] = isChecked;
+                selectedPredictors.add(predictorVariables[which]);
+            }
+        });
+        predictorsPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final int[] checkedPredicted = {-1};
+                AlertDialog.Builder predictedPicker = new AlertDialog.Builder(getContext());
+                predictedPicker.setTitle("Alegeți variabila pentru prezis");
+                predictedPicker.setSingleChoiceItems(predictedVariables, checkedPredicted[0], new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        checkedPredicted[0] = which;
+                    }
+                });
+                predictedPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        boolean[] checked = new boolean[6];
+                        for(String selectedPredictor : selectedPredictors){
+                            if(selectedPredictor.equals("Temperatură")){
+                                checked[0] = true;
+                            }else if(selectedPredictor.equals("Presiune atmosferică")){
+                                checked[1] = true;
+                            }else if(selectedPredictor.equals("Umiditate")){
+                                checked[2] = true;
+                            }
+                        }
+                        String predictedVariableString = predictedVariables[checkedPredicted[0]];
+                        if(predictedVariableString.equals("Tensiune arterială sistolică")){
+                            checked[3] = true;
+                        }else if(predictedVariableString.equals("Tensiune arterială diastolică")){
+                            checked[4] = true;
+                        }else if(predictedVariableString.equals("Puls")){
+                            checked[5] = true;
+                        }
+
+                        if(viewId == R.id.linearRegressionBtn) {
+                            Log.d(TAG, "REG");
+                            classify(LINEAR_REGRESSION,checked);
+                        }else if(viewId == R.id.multilayerPerceptronBtn){
+                            Log.d(TAG, "MULTI");
+                            classify(MULTILAYER_PERCEPTRON, checked);
+                        }else if(viewId == R.id.SMORegBtn){
+                            Log.d(TAG, "SMO");
+                            classify(SMO_REG, checked);
+                        }
+                    }
+                });
+                predictedPicker.setNegativeButton("Anulează", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        predictedPicker.create().dismiss();
+                    }
+                });
+                predictedPicker.create().show();
+            }
+        });
+        predictorsPicker.setNegativeButton("Anulează", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                predictorsPicker.create().dismiss();
+            }
+        });
+        predictorsPicker.create().show();
+    }
+
     private Instances getInstances(){
         Instances dataSet = new Instances("Data", attributeList, 365);
         for(CardioAndWeatherRecord c : instances){
@@ -324,7 +361,7 @@ public class StatisticsFragment extends Fragment {
         return dataSet;
     }
 
-    public void trainDataSet(boolean[] checked){
+    private void classify(int type, boolean[] checked){
         try{
             int j = 0;
             for(int i = 0; i < 6; i++) {
@@ -359,11 +396,24 @@ public class StatisticsFragment extends Fragment {
             Log.d(TAG, "Testing data: " + testingData);
 
             Evaluation evaluation = new Evaluation(trainingData);
-            LinearRegression model = new LinearRegression();
+            Classifier model = new LinearRegression();
+            switch(type){
+                case LINEAR_REGRESSION:
+                    model = new LinearRegression();
+                    break;
+                case MULTILAYER_PERCEPTRON:
+                    model = new MultilayerPerceptron();
+                    break;
+                case SMO_REG:
+                    model = new SMOreg();
+                    break;
+            }
             model.buildClassifier(trainingData);
             evaluation.evaluateModel(model, testingData);
 
-            String statsStr = evaluation.toSummaryString() + "\n";
+            String statsStr = model.toString() + "\n" +
+                    evaluation.toSummaryString() + "\n";
+
             statsStr += "           Actual Predicted\n";
             Log.d(TAG, "Evaluation: " + evaluation.toSummaryString());
 

@@ -76,4 +76,8 @@
     <string name="nebulosity_ro">Nebulozitate:</string>
     <string name="logout_ro">Deconectare</string>
     <string name="correlation_coefficient_ro">Coeficientul de corelație</string>
+    <string name="linear_regression_ro">Regresie liniară</string>
+    <string name="multilayer_perceptron_ro">MultiLayer Perceptron</string>
+    <string name="smoreg_ro">SMO Reg</string>
+    <string name="statistics_ro">Informații statistice</string>
 </resources>

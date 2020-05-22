@@ -2,16 +2,19 @@ package ro.uvt.asavoaei.andreea.cardiovascularapp.fragment;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.method.ScrollingMovementMethod;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -19,6 +22,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,7 +59,16 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -67,6 +81,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import ro.uvt.asavoaei.andreea.cardiovascularapp.R;
@@ -83,16 +98,33 @@ import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.BloodPressureAndWindSpeed
 import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.BloodPressureMarkerView;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.FloatValueFormatter;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.PulseMarkerView;
+import weka.classifiers.Evaluation;
+import weka.classifiers.evaluation.Prediction;
+import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.functions.SMOreg;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.classifiers.Classifier;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
+
 
 public class StatisticsFragment extends Fragment {
     private static final String TAG = StatisticsFragment.class.getName();
     private static final String dateFormat = "dd-MM-yyyy";
+    private static final int LINEAR_REGRESSION = 1;
+    private static final int MULTILAYER_PERCEPTRON = 2;
+    private static final int SMO_REG = 3;
     private LoadingDialog loadingDialog;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
     private TextView bpTempCorrelationTv, bpPressureCorrelationTv, bpHumidityCorrelationTv, bpWindSpeedCorrelationTv;
     private RadioGroup timeRg;
+    private Button linearRegressionBtn, multilayerPerceptronBtn, SMORegBtn;
     private String emailAddress = "", city = "";
     private int height = 0;
     private Date startingDate;
@@ -138,8 +170,15 @@ public class StatisticsFragment extends Fragment {
     private ArrayList<Entry> windSpeed = new ArrayList<>();
     private ArrayList<PieEntry> bloodPressurePieEntry = new ArrayList<>();
 
-
-
+    private List<CardioAndWeatherRecord> instances = new ArrayList<>();
+    private final Attribute systolicBloodPressureAttribute = new Attribute("systolicbp");
+    private final Attribute diastolicBloodPressureAttribute = new Attribute("diastolicbp");
+    private final Attribute pulseAttribute = new Attribute("pulse");
+    private final Attribute temperatureAttribute = new Attribute("temperature");
+    private final Attribute pressureAttribute = new Attribute("pressure");
+    private final Attribute humidityAttribute = new Attribute("humidity");
+    private ArrayList<Attribute> attributeList = new ArrayList<>();
+    private WeatherRecord currentWeather = new WeatherRecord();
 
     @Nullable
     @Override
@@ -153,12 +192,43 @@ public class StatisticsFragment extends Fragment {
         bloodPressureAndHumidityLc = view.findViewById(R.id.bpHumidityChart);
         bloodPressureAndWindSpeedLc = view.findViewById(R.id.bpWindSpeedChart);
         hypertensionStagesPc = view.findViewById(R.id.bpStagesChart);
-
         timeRg = view.findViewById(R.id.timeRg);
         bpTempCorrelationTv = view.findViewById(R.id.bpTempCorrelationTv);
         bpPressureCorrelationTv = view.findViewById(R.id.bpPressureCorrelationTv);
         bpHumidityCorrelationTv = view.findViewById(R.id.bpHumidityCorrelationTv);
         bpWindSpeedCorrelationTv = view.findViewById(R.id.bpWindSpeedCorrelationTv);
+        linearRegressionBtn = view.findViewById(R.id.linearRegressionBtn);
+        multilayerPerceptronBtn = view.findViewById(R.id.multilayerPerceptronBtn);
+        SMORegBtn = view.findViewById(R.id.SMORegBtn);
+
+        attributeList.add(temperatureAttribute);
+        attributeList.add(pressureAttribute);
+        attributeList.add(humidityAttribute);
+        attributeList.add(systolicBloodPressureAttribute);
+        attributeList.add(diastolicBloodPressureAttribute);
+        attributeList.add(pulseAttribute);
+
+        linearRegressionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayVariablesPickers(v.getId());
+            }
+        });
+
+        multilayerPerceptronBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                displayVariablesPickers(v.getId());
+            }
+        });
+
+        SMORegBtn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                displayVariablesPickers(v.getId());
+            }
+        });
 
         if (firebaseAuth.getCurrentUser() != null) {
             emailAddress = firebaseAuth.getCurrentUser().getEmail();
@@ -193,6 +263,197 @@ public class StatisticsFragment extends Fragment {
             });
         }
         return view;
+    }
+
+    private void displayVariablesPickers(int viewId){
+        new GetWeather().execute();
+        String[] predictorVariables = new String[]{"Temperatură", "Presiune atmosferică", "Umiditate"};
+        String[] predictedVariables = new String[]{"Tensiune arterială sistolică", "Tensiune arterială diastolică", "Puls"};
+        List<String> selectedPredictors = new ArrayList<>();
+        boolean[] checkedPredictors = new boolean[predictorVariables.length];
+
+        AlertDialog.Builder predictorsPicker = new AlertDialog.Builder(getActivity());
+        predictorsPicker.setTitle("Alegeți variabilele predictori");
+        predictorsPicker.setMultiChoiceItems(predictorVariables, checkedPredictors, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                checkedPredictors[which] = isChecked;
+                selectedPredictors.add(predictorVariables[which]);
+            }
+        });
+        predictorsPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final int[] checkedPredicted = {-1};
+                AlertDialog.Builder predictedPicker = new AlertDialog.Builder(getContext());
+                predictedPicker.setTitle("Alegeți variabila pentru prezis");
+                predictedPicker.setSingleChoiceItems(predictedVariables, checkedPredicted[0], new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        checkedPredicted[0] = which;
+                    }
+                });
+                predictedPicker.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        boolean[] checked = new boolean[6];
+                        for(String selectedPredictor : selectedPredictors){
+                            if(selectedPredictor.equals("Temperatură")){
+                                checked[0] = true;
+                            }else if(selectedPredictor.equals("Presiune atmosferică")){
+                                checked[1] = true;
+                            }else if(selectedPredictor.equals("Umiditate")){
+                                checked[2] = true;
+                            }
+                        }
+                        String predictedVariableString = predictedVariables[checkedPredicted[0]];
+                        if(predictedVariableString.equals("Tensiune arterială sistolică")){
+                            checked[3] = true;
+                        }else if(predictedVariableString.equals("Tensiune arterială diastolică")){
+                            checked[4] = true;
+                        }else if(predictedVariableString.equals("Puls")){
+                            checked[5] = true;
+                        }
+
+                        if(viewId == R.id.linearRegressionBtn) {
+                            Log.d(TAG, "REG");
+                            classify(LINEAR_REGRESSION,checked);
+                        }else if(viewId == R.id.multilayerPerceptronBtn){
+                            Log.d(TAG, "MULTI");
+                            classify(MULTILAYER_PERCEPTRON, checked);
+                        }else if(viewId == R.id.SMORegBtn){
+                            Log.d(TAG, "SMO");
+                            classify(SMO_REG, checked);
+                        }
+                    }
+                });
+                predictedPicker.setNegativeButton("Anulează", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        predictedPicker.create().dismiss();
+                    }
+                });
+                predictedPicker.create().show();
+            }
+        });
+        predictorsPicker.setNegativeButton("Anulează", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                predictorsPicker.create().dismiss();
+            }
+        });
+        predictorsPicker.create().show();
+    }
+
+    private Instances getInstances(){
+        Instances dataSet = new Instances("Data", attributeList, 365);
+        for(CardioAndWeatherRecord c : instances){
+            Instance currentInstance = new DenseInstance(6);
+            currentInstance.setValue(temperatureAttribute, c.getTemperature());
+            currentInstance.setValue(pressureAttribute, c.getPressure());
+            currentInstance.setValue(humidityAttribute, c.getHumidity());
+            currentInstance.setValue(systolicBloodPressureAttribute, c.getSystolicBP());
+            currentInstance.setValue(diastolicBloodPressureAttribute, c.getDiastolicBP());
+            currentInstance.setValue(pulseAttribute, c.getPulse());
+            Log.d(TAG, "CARDIO: " + c);
+            dataSet.add(currentInstance);
+        }
+        return dataSet;
+    }
+
+    private void classify(int type, boolean[] checked){
+        try{
+            int j = 0;
+            for(int i = 0; i < 6; i++) {
+                if (checked[i]) {
+                    j++;
+                }
+            }
+            int[] indicesToKeep = new int[j];
+            j = 0;
+            for(int i = 0; i < 6; i++){
+                if(checked[i]){
+                    indicesToKeep[j++] = i;
+                }
+            }
+            Instances data = getInstances();
+            data.setClassIndex(data.numAttributes() - 1);
+            Remove removeFilter = new Remove();
+            removeFilter.setAttributeIndicesArray(indicesToKeep);
+            removeFilter.setInvertSelection(true);
+            removeFilter.setInputFormat(data);
+            Instances newData = Filter.useFilter(data, removeFilter);
+            newData.setClassIndex(newData.numAttributes() - 1);
+            Log.d(TAG, "Num instances: " + newData.numInstances());
+            int percent70 = (int)(newData.numInstances()*0.7);
+            Log.d(TAG, "70% = " + percent70);
+            Instances trainingData = new Instances(newData, 0, percent70);
+            int percent30 = (int)(newData.numInstances()*0.3);
+            Log.d(TAG, "30% = " + percent30);
+            Instances testingData = new Instances(newData, percent70, percent30);
+
+            Log.d(TAG, "Training data: " + trainingData);
+            Log.d(TAG, "Testing data: " + testingData);
+
+            Evaluation evaluation = new Evaluation(trainingData);
+            Classifier model = new LinearRegression();
+            switch(type){
+                case LINEAR_REGRESSION:
+                    model = new LinearRegression();
+                    break;
+                case MULTILAYER_PERCEPTRON:
+                    model = new MultilayerPerceptron();
+                    break;
+                case SMO_REG:
+                    model = new SMOreg();
+                    break;
+            }
+            model.buildClassifier(trainingData);
+            evaluation.evaluateModel(model, testingData);
+
+            String statsStr = model.toString() + "\n" +
+                    evaluation.toSummaryString() + "\n";
+
+            statsStr += "           Actual Predicted\n";
+            Log.d(TAG, "Evaluation: " + evaluation.toSummaryString());
+
+            for(Object prediction : evaluation.predictions()){
+                statsStr += prediction + "\n";
+                Log.d(TAG, "Predictions: " + prediction);
+            }
+
+            // Test instance
+            Instance instance = new DenseInstance(newData.numAttributes());
+            for(int i = 0; i < indicesToKeep.length; i++){
+                if(indicesToKeep[i] == 0){
+                    Log.d(TAG, "TEMPERATURA");
+                    instance.setValue(newData.attribute("temperature"), currentWeather.getTemperature());
+                }else if(indicesToKeep[i] == 1){
+                    Log.d(TAG, "PRESIUNE ATMOSFERICA");
+                    instance.setValue(newData.attribute("pressure"), currentWeather.getPressure());
+                }else if(indicesToKeep[i] == 2){
+                    Log.d(TAG, "UMIDITATE");
+                    instance.setValue(newData.attribute("humidity"), currentWeather.getHumidity());
+                }
+            }
+            instance.setDataset(newData);
+
+            statsStr += "Last instance: " + instance + "\n";
+            Log.d(TAG, "Last instance " + instance);
+            statsStr += "Predicted value: " + model.classifyInstance(instance);
+            Log.d(TAG, "Systolic BP value " + model.classifyInstance(instance));
+            statsStr += "\n";
+            Dialog displaySets = new Dialog(getContext());
+            displaySets.setContentView(R.layout.dialog_weka);
+            final TextView statsTv = displaySets.findViewById(R.id.statisticsTv);
+            statsTv.setMovementMethod(new ScrollingMovementMethod());
+            statsTv.setText(statsStr);
+            displaySets.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            displaySets.create();
+            displaySets.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void retrieveUserProfile() {
@@ -346,10 +607,8 @@ public class StatisticsFragment extends Fragment {
                             diastolic.add(new Entry(timeMillis, c.getDiastolicBP()));
                             pulse.add(new Entry(timeMillis, c.getPulse()));
 
-                            //createPieEntryList(c);
                             addBloodPressureToCategory(c);
-
-
+                            addInstanceToInstancesList(c, w);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -373,6 +632,8 @@ public class StatisticsFragment extends Fragment {
 
         bloodPressurePieEntry = new ArrayList<>();
         bpAveragesOnCategories = new HashMap<>();
+
+        instances = new ArrayList<>();
 
         normalBp = 0;
         elevatedBp = 0;
@@ -412,8 +673,18 @@ public class StatisticsFragment extends Fragment {
         }
     }
 
+    private void addInstanceToInstancesList(CardioRecord c, WeatherRecord w){
+        CardioAndWeatherRecord cardioAndWeatherRecord = new CardioAndWeatherRecord();
+        cardioAndWeatherRecord.setSystolicBP(c.getSystolicBP());
+        cardioAndWeatherRecord.setDiastolicBP(c.getDiastolicBP());
+        cardioAndWeatherRecord.setPulse(c.getPulse());
+        cardioAndWeatherRecord.setTemperature(w.getTemperature());
+        cardioAndWeatherRecord.setPressure(w.getPressure());
+        cardioAndWeatherRecord.setHumidity(w.getHumidity());
+        instances.add(cardioAndWeatherRecord);
+    }
+
     private void computeAveragesForBloodPressure(){
-        Log.d(TAG, "Before average: " + bpAveragesOnCategories);
         for(String category : bpAveragesOnCategories.keySet()){
             if(category.equals("Normală") && normalBp > 0) {
                 bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / normalBp);
@@ -427,7 +698,6 @@ public class StatisticsFragment extends Fragment {
                 bpAveragesOnCategories.put(category, bpAveragesOnCategories.get(category) / hypertensiveCrisis);
             }
         }
-        Log.d(TAG, "After average: " + bpAveragesOnCategories);
     }
 
     private void createEntryListForBPPieChart(){
@@ -448,7 +718,7 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void computeCorrelationCoefficient(){
-        Log.d(TAG, "Sizes: " + systolic.size() + " - " + diastolic.size() + " - " + temperature.size() + " - " + pressure.size() + " - " + humidity.size() + " - " + windSpeed.size());
+        //Log.d(TAG, "Sizes: " + systolic.size() + " - " + diastolic.size() + " - " + temperature.size() + " - " + pressure.size() + " - " + humidity.size() + " - " + windSpeed.size());
         double[] systolicData = new double[systolic.size()];
         double[] diastolicData = new double[diastolic.size()];
         double[] temperatureData = new double[temperature.size()];
@@ -1373,6 +1643,86 @@ public class StatisticsFragment extends Fragment {
         protected Void doInBackground(Void... voids) {
             retrieveUserProfile();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+    private class GetWeather extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            retrieveCurrentWeather("http://www.meteoromania.ro/wp-json/meteoapi/v2/starea-vremii");
+            return null;
+        }
+
+        private void retrieveCurrentWeather(String urlString){
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+            try{
+                URL url = new URL(urlString);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                InputStream stream = connection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+                JSONObject jsonObject = new JSONObject(buffer.toString());
+                parseItems(jsonObject);
+            }catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        private void parseItems(JSONObject jsonObject) throws IOException, JSONException {
+            JSONArray weatherRecordJsonArray = jsonObject.getJSONArray("features");
+            for(int i = 0; i < weatherRecordJsonArray.length(); i++){
+                JSONObject currentFeatureObject = weatherRecordJsonArray.getJSONObject(i);
+                JSONObject geometryObject = currentFeatureObject.getJSONObject("geometry");
+                JSONArray coordinatesArray = geometryObject.getJSONArray("coordinates");
+                JSONObject propertiesObject = currentFeatureObject.getJSONObject("properties");
+                if(propertiesObject.getString("nume").equals(city)) {
+                    currentWeather.setLatitude(Double.valueOf(coordinatesArray.getString(0)));
+                    currentWeather.setLongitude(Double.valueOf(coordinatesArray.getString(1)));
+                    currentWeather.setCity(propertiesObject.getString("nume"));
+                    currentWeather.setHumidity(propertiesObject.getInt("umezeala"));
+                    currentWeather.setNebulosity(propertiesObject.getString("nebulozitate"));
+                    currentWeather.setTemperature(Double.valueOf(propertiesObject.getString("tempe")));
+                    String windSpeedStr = propertiesObject.getString("vant").replace("\\", ")");
+                    if (windSpeedStr.matches("\\w*")) {
+                        currentWeather.setWindSpeed(0.0);
+                    } else {
+                        currentWeather.setWindSpeed(Double.valueOf(windSpeedStr.split("m")[0]));
+                    }
+                    currentWeather.setPressure(Double.valueOf(propertiesObject.getString("presiunetext").split("mb")[0]));
+                    String[] date = propertiesObject.getString("actualizat").split("&nbsp;ora&nbsp;");
+                    currentWeather.setRecordingDate(date[0]);
+                    currentWeather.setRecordingHour(date[1]);
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            //trainDataSet();
         }
     }
 }

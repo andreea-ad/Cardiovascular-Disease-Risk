@@ -379,5 +379,35 @@
                     android:layout_marginBottom="20dp" />
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/linearRegressionBtn"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:background="@drawable/default_button"
+            android:text="@string/linear_regression_ro"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/multilayerPerceptronBtn"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/default_button"
+            android:text="@string/multilayer_perceptron_ro"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/SMORegBtn"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/default_button"
+            android:text="@string/smoreg_ro"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 </ScrollView>

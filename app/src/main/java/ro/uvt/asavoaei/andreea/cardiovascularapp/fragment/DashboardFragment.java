@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -154,6 +155,8 @@ public class DashboardFragment extends Fragment {
                         diastolic.add(new Entry(i, diastolicValues.get(i)));
                     }
                     showChartDiastolic();
+                }else{
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -292,6 +295,8 @@ public class DashboardFragment extends Fragment {
                     }
                     systolicTv.setText(String.valueOf(maxSystolic));
                     diastolicTv.setText(String.valueOf(maxDiastolic));
+                }else{
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -317,8 +322,8 @@ public class DashboardFragment extends Fragment {
                     }
                     pulseTv.setText(String.valueOf(lastPulse));
                     cholesterolTv.setText(String.valueOf(lastCholesterol));
-                    loadingDialog.dismissDialog();
                 }
+                loadingDialog.dismissDialog();
             }
 
             @Override

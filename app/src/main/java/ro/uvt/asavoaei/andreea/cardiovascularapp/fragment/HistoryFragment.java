@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,7 +51,6 @@ public class HistoryFragment extends Fragment {
     private DatabaseReference databaseReference = firebaseDatabase.getReference();
     private FirebaseAuth firebaseAuth;
     private RecyclerView historyRecyclerView;
-    //private RadioButton recordingDateRb, bloodPressureRb, pulseRb, ascendingRb, descendingRb;
     private RadioGroup timeRg, sortRg;
     private LoadingDialog loadingDialog;
     private List<CardioAndWeatherRecord> cardioAndWeatherRecordList = new ArrayList<>();
@@ -73,11 +73,6 @@ public class HistoryFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_history, null);
         loadingDialog = new LoadingDialog(getContext());
         historyRecyclerView = v.findViewById(R.id.cardioHistoryRv);
-//        recordingDateRb = v.findViewById(R.id.recordingDateRb);
-//        bloodPressureRb = v.findViewById(R.id.bloodPressureRb);
-//        pulseRb = v.findViewById(R.id.pulseRb);
-//        ascendingRb = v.findViewById(R.id.sortAscendingRb);
-//        descendingRb = v.findViewById(R.id.sortDescendingRb);
         timeRg = v.findViewById(R.id.timeRg);
         sortRg = v.findViewById(R.id.sortRg);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -150,12 +145,15 @@ public class HistoryFragment extends Fragment {
 
     private void initializeList() {
         cardioAndWeatherRecordList = sortBy(listToSort, RECORDING_DATE, SORT_ASCENDING);
-        for (CardioAndWeatherRecord c : cardioAndWeatherRecordList) {
-            Log.d(TAG, "SORTED: " + c);
+        if(!cardioAndWeatherRecordList.isEmpty()) {
+            for (CardioAndWeatherRecord c : cardioAndWeatherRecordList) {
+                Log.d(TAG, "SORTED: " + c);
+            }
+            setAdapter();
+        }else{
+            Toast.makeText(getContext(), "Nu au fost găsite date în baza de date.", Toast.LENGTH_LONG).show();
         }
         loadingDialog.dismissDialog();
-        setAdapter();
-
     }
 
     private List<CardioAndWeatherRecord> sortBy(List<CardioAndWeatherRecord> list, int sortBy, int order) {
@@ -255,6 +253,8 @@ public class HistoryFragment extends Fragment {
                         }
                     }
                     getWeather();
+                }else{
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -291,6 +291,8 @@ public class HistoryFragment extends Fragment {
                         }
                     }
                     concatenateLists();
+                }else{
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -317,6 +319,8 @@ public class HistoryFragment extends Fragment {
                         }
                     }
                     getCardio();
+                }else{
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -328,30 +332,31 @@ public class HistoryFragment extends Fragment {
     }
 
     private void concatenateLists() {
-        for (CardioRecord c : allCardioRecordsByUser) {
-            for (WeatherRecord w : filteredWeatherRecords) {
-                if (c.getRecordingDate().equals(w.getRecordingDate()) && c.getRecordingHour().split(":")[0].equals(w.getRecordingHour().split(":")[0])) {
-                    CardioAndWeatherRecord cardioAndWeatherRecord = new CardioAndWeatherRecord();
-                    cardioAndWeatherRecord.setSystolicBP(c.getSystolicBP());
-                    cardioAndWeatherRecord.setDiastolicBP(c.getDiastolicBP());
-                    cardioAndWeatherRecord.setPulse(c.getPulse());
-                    cardioAndWeatherRecord.setCholesterol(c.getCholesterol());
-                    cardioAndWeatherRecord.setBMI(c.getWeight() / (int) Math.pow((double) userHeight / 100, 2));
-                    cardioAndWeatherRecord.setPregnant(isPregnant);
-                    cardioAndWeatherRecord.setSmoker(isSmoker);
-                    cardioAndWeatherRecord.setTemperature(w.getTemperature());
-                    cardioAndWeatherRecord.setHumidity(w.getHumidity());
-                    cardioAndWeatherRecord.setPressure(w.getPressure());
-                    cardioAndWeatherRecord.setNebulosity(w.getNebulosity());
-                    cardioAndWeatherRecord.setRecordingDate(c.getRecordingDate());
-                    cardioAndWeatherRecord.setRecordingHour(c.getRecordingHour());
-                    listToSort.add(cardioAndWeatherRecord);
+        if(!allCardioRecordsByUser.isEmpty() && !filteredWeatherRecords.isEmpty()) {
+            for (CardioRecord c : allCardioRecordsByUser) {
+                for (WeatherRecord w : filteredWeatherRecords) {
+                    if (c.getRecordingDate().equals(w.getRecordingDate()) && c.getRecordingHour().split(":")[0].equals(w.getRecordingHour().split(":")[0])) {
+                        CardioAndWeatherRecord cardioAndWeatherRecord = new CardioAndWeatherRecord();
+                        cardioAndWeatherRecord.setSystolicBP(c.getSystolicBP());
+                        cardioAndWeatherRecord.setDiastolicBP(c.getDiastolicBP());
+                        cardioAndWeatherRecord.setPulse(c.getPulse());
+                        cardioAndWeatherRecord.setCholesterol(c.getCholesterol());
+                        cardioAndWeatherRecord.setBMI(c.getWeight() / (int) Math.pow((double) userHeight / 100, 2));
+                        cardioAndWeatherRecord.setPregnant(isPregnant);
+                        cardioAndWeatherRecord.setSmoker(isSmoker);
+                        cardioAndWeatherRecord.setTemperature(w.getTemperature());
+                        cardioAndWeatherRecord.setHumidity(w.getHumidity());
+                        cardioAndWeatherRecord.setPressure(w.getPressure());
+                        cardioAndWeatherRecord.setNebulosity(w.getNebulosity());
+                        cardioAndWeatherRecord.setRecordingDate(c.getRecordingDate());
+                        cardioAndWeatherRecord.setRecordingHour(c.getRecordingHour());
+                        listToSort.add(cardioAndWeatherRecord);
+                    }
                 }
             }
+            initializeList();
         }
-        initializeList();
     }
-
 
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {
 
@@ -367,5 +372,4 @@ public class HistoryFragment extends Fragment {
         }
 
     }
-
 }

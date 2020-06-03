@@ -23,8 +23,8 @@ public class BloodPressureAndPressureMarkerView extends MarkerView {
 
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
-        if (e.getY() > 300) {
-            tvContent.setText(e.getY() + "mb");
+        if (e.getY() < 110 && e.getY() > 90) {
+            tvContent.setText(e.getY() + "cb");
         } else {
             tvContent.setText(Utils.formatNumber(e.getY(), 0, true) + "mmHg");
         }

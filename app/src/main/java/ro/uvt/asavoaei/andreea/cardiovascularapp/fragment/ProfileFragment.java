@@ -69,9 +69,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, null);
-
         loadingDialog = new LoadingDialog(getContext());
-
         removeAccountIv = view.findViewById(R.id.removeAccountIv);
         nameEt = view.findViewById(R.id.nameEt);
         genderAgeTv = view.findViewById(R.id.genderAgeTv);
@@ -209,9 +207,7 @@ public class ProfileFragment extends Fragment {
                     startActivity(openLoginActivity);
                 }
             });
-
         }
-
         return view;
     }
 
@@ -313,6 +309,8 @@ public class ProfileFragment extends Fragment {
                         }
                     }
                     setData();
+                }else{
+                    loadingDialog.dismissDialog();
                 }
             }
 

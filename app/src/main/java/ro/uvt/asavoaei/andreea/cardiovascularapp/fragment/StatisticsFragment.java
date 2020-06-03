@@ -256,13 +256,28 @@ public class StatisticsFragment extends Fragment {
                     startingDate = Date.from(currentDate.minusDays(numberOfEntries).atStartOfDay()
                             .atZone(ZoneId.systemDefault())
                             .toInstant());
-                    createEntryLists();
-                    computeCorrelationCoefficient();
-                    createCharts();
+                    setData();
                 }
             });
         }
         return view;
+    }
+
+    private void setData(){
+        if(dataExists()) {
+            createEntryLists();
+            createCharts();
+            bpTempCorrelationTv.setText(null);
+            bpPressureCorrelationTv.setText(null);
+            bpHumidityCorrelationTv.setText(null);
+            bpWindSpeedCorrelationTv.setText(null);
+            setClickableButtons(false);
+            if(isDataValid()){
+                computeCorrelationCoefficient();
+                setClickableButtons(true);
+            }
+            loadingDialog.dismissDialog();
+        }
     }
 
     private void displayVariablesPickers(int viewId){
@@ -456,6 +471,24 @@ public class StatisticsFragment extends Fragment {
         }
     }
 
+    private boolean dataExists(){
+        if(cardioRecordList.isEmpty() && weatherRecordList.isEmpty())
+            return false;
+        return true;
+    }
+
+    private boolean isDataValid(){
+        if(systolic.isEmpty() && diastolic.isEmpty() && pulse.isEmpty() && temperature.isEmpty() && pressure.isEmpty() && humidity.isEmpty() && windSpeed.isEmpty())
+            return false;
+        return true;
+    }
+
+    private void setClickableButtons(boolean clickable){
+        linearRegressionBtn.setClickable(clickable);
+        multilayerPerceptronBtn.setClickable(clickable);
+        SMORegBtn.setClickable(clickable);
+    }
+
     private void retrieveUserProfile() {
         Query getUserProfileByEmail = databaseReference.child("user-profile").orderByChild("emailAddress").equalTo(emailAddress);
         getUserProfileByEmail.addValueEventListener(new ValueEventListener() {
@@ -471,6 +504,9 @@ public class StatisticsFragment extends Fragment {
                         }
                     }
                     retrieveWeatherRecords();
+                }else{
+                    setClickableButtons(false);
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -496,9 +532,10 @@ public class StatisticsFragment extends Fragment {
                     }
                     cardioRecordList = new ArrayList<>(cardioRecordSet);
                     Collections.sort(cardioRecordList, (CardioRecord c1, CardioRecord c2) -> sortCardioRecordByDate(c1, c2));
-                    createEntryLists();
-                    computeCorrelationCoefficient();
-                    createCharts();
+                    setData();
+                }else{
+                    setClickableButtons(false);
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -525,6 +562,9 @@ public class StatisticsFragment extends Fragment {
                     weatherRecordList = new ArrayList<>(weatherRecordSet);
                     Collections.sort(weatherRecordList, (WeatherRecord w1, WeatherRecord w2) -> sortWeatherRecordByDate(w1, w2));
                     retrieveCardioRecords();
+                }else{
+                    setClickableButtons(false);
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -583,7 +623,6 @@ public class StatisticsFragment extends Fragment {
 
     private void createEntryLists() {
         initializeUtils();
-
         for (CardioRecord c : cardioRecordList) {
             for (WeatherRecord w : weatherRecordList) {
                 if (c.getRecordingDate().equals(w.getRecordingDate()) && c.getRecordingHour().split(":")[0].equals(w.getRecordingHour().split(":")[0])) {
@@ -599,7 +638,7 @@ public class StatisticsFragment extends Fragment {
                             Log.d(TAG, "W:" + w);
 
                             temperature.add(new Entry(timeMillis, (float) w.getTemperature()));
-                            pressure.add(new Entry(timeMillis, (float) w.getPressure()));
+                            pressure.add(new Entry(timeMillis, (float) w.getPressure()/10));
                             humidity.add(new Entry(timeMillis, (float) w.getHumidity()));
                             windSpeed.add(new Entry(timeMillis, (float) w.getWindSpeed()));
 
@@ -616,8 +655,10 @@ public class StatisticsFragment extends Fragment {
                 }
             }
         }
-        computeAveragesForBloodPressure();
-        createEntryListForBPPieChart();
+        if(isDataValid()) {
+            computeAveragesForBloodPressure();
+            createEntryListForBPPieChart();
+        }
     }
 
     private void initializeUtils(){
@@ -646,7 +687,6 @@ public class StatisticsFragment extends Fragment {
         bpAveragesOnCategories.put("Hipertensiune - stadiul I", 0f);
         bpAveragesOnCategories.put("Hipertensiune - stadiul II", 0f);
         bpAveragesOnCategories.put("Criză hipertensivă", 0f);
-
     }
 
     private void addBloodPressureToCategory(CardioRecord c){
@@ -713,95 +753,94 @@ public class StatisticsFragment extends Fragment {
             }else if(category.equals("Criza hipertensivă") && hypertensiveCrisis > 0){
                 bloodPressurePieEntry.add(new PieEntry(hypertensiveCrisis, category));
             }
-            //bloodPressurePieEntry.add(new PieEntry(bpAveragesOnCategories.get(category), category));
         }
     }
 
     private void computeCorrelationCoefficient(){
-        //Log.d(TAG, "Sizes: " + systolic.size() + " - " + diastolic.size() + " - " + temperature.size() + " - " + pressure.size() + " - " + humidity.size() + " - " + windSpeed.size());
-        double[] systolicData = new double[systolic.size()];
-        double[] diastolicData = new double[diastolic.size()];
-        double[] temperatureData = new double[temperature.size()];
-        double[] pressureData = new double[pressure.size()];
-        double[] humidityData = new double[humidity.size()];
-        double[] windSpeedData = new double[windSpeed.size()];
+        if(isDataValid()) {
+            double[] systolicData = new double[systolic.size()];
+            double[] diastolicData = new double[diastolic.size()];
+            double[] temperatureData = new double[temperature.size()];
+            double[] pressureData = new double[pressure.size()];
+            double[] humidityData = new double[humidity.size()];
+            double[] windSpeedData = new double[windSpeed.size()];
 
-        int i = 0;
-        for(Entry e : systolic){
-            systolicData[i++] = e.getY();
+            int i = 0;
+            for (Entry e : systolic) {
+                systolicData[i++] = e.getY();
+            }
+            i = 0;
+            for (Entry e : diastolic) {
+                diastolicData[i++] = e.getY();
+            }
+            i = 0;
+            for (Entry e : temperature) {
+                temperatureData[i++] = e.getY();
+            }
+            i = 0;
+            for (Entry e : pressure) {
+                pressureData[i++] = e.getY();
+            }
+            i = 0;
+            for (Entry e : humidity) {
+                humidityData[i++] = e.getY();
+            }
+            i = 0;
+            for (Entry e : windSpeed) {
+                windSpeedData[i++] = e.getY();
+            }
+
+            PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
+            double temperatureSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, temperatureData);
+            double temperatureDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, temperatureData);
+
+            double pressureSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, pressureData);
+            double pressureDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, pressureData);
+
+            double humiditySystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, humidityData);
+            double humidityDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, humidityData);
+
+            double windSpeedSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, windSpeedData);
+            double windSpeedDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, windSpeedData);
+
+            DecimalFormat decimalFormatter = new DecimalFormat("#.###");
+
+            String temperatureSystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(temperatureSystolicCorrelationCoefficient));
+            String temperatureDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(temperatureDiastolicCorrelationCoefficient));
+            SpannableStringBuilder tempSpannable = new SpannableStringBuilder();
+            tempSpannable.append("Tensiune arterială sistolică - temperatură: ", new StyleSpan(Typeface.NORMAL), 0);
+            tempSpannable.append(temperatureSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED), 0).append('\n');
+            tempSpannable.append("Tensiune arterială diastolică - temperatură: ", new StyleSpan(Typeface.NORMAL), 0);
+            tempSpannable.append(temperatureDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE), 0);
+            bpTempCorrelationTv.setText(tempSpannable);
+
+            String pressureSystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(pressureSystolicCorrelationCoefficient));
+            String pressureDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(pressureDiastolicCorrelationCoefficient));
+            SpannableStringBuilder pressureSpannable = new SpannableStringBuilder();
+            pressureSpannable.append("Tensiune arterială sistolică - presiune atmosferică: ", new StyleSpan(Typeface.NORMAL), 0);
+            pressureSpannable.append(pressureSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED), 0).append('\n');
+            pressureSpannable.append("Tensiune arterială diastolică - presiune atmosferică: ", new StyleSpan(Typeface.NORMAL), 0);
+            pressureSpannable.append(pressureDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE), 0);
+            bpPressureCorrelationTv.setText(pressureSpannable);
+
+            String humiditySystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(humiditySystolicCorrelationCoefficient));
+            String humidityDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(humidityDiastolicCorrelationCoefficient));
+            SpannableStringBuilder humiditySpannable = new SpannableStringBuilder();
+            humiditySpannable.append("Tensiune arterială sistolică - umiditate: ", new StyleSpan(Typeface.NORMAL), 0);
+            humiditySpannable.append(humiditySystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED), 0).append('\n');
+            humiditySpannable.append("Tensiune arterială diastolică - umiditate: ", new StyleSpan(Typeface.NORMAL), 0);
+            humiditySpannable.append(humidityDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE), 0);
+            bpHumidityCorrelationTv.setText(humiditySpannable);
+
+            String windSpeedSystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(windSpeedSystolicCorrelationCoefficient));
+            String windSpeedDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(windSpeedDiastolicCorrelationCoefficient));
+            SpannableStringBuilder windSpeedSpannable = new SpannableStringBuilder();
+            windSpeedSpannable.append("Tensiune arterială sistolică - viteza vântului: ", new StyleSpan(Typeface.NORMAL), 0);
+            windSpeedSpannable.append(windSpeedSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED), 0).append('\n');
+            windSpeedSpannable.append("Tensiune arterială diastolică - viteza vântului: ", new StyleSpan(Typeface.NORMAL), 0);
+            windSpeedSpannable.append(windSpeedDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE), 0);
+            bpWindSpeedCorrelationTv.setText(windSpeedSpannable);
         }
-        i = 0;
-        for(Entry e : diastolic){
-            diastolicData[i++] = e.getY();
-        }
-        i = 0;
-        for(Entry e : temperature){
-            temperatureData[i++] = e.getY();
-        }
-        i = 0;
-        for(Entry e : pressure){
-            pressureData[i++] = e.getY();
-        }
-        i = 0;
-        for(Entry e : humidity){
-            humidityData[i++] = e.getY();
-        }
-        i = 0;
-        for(Entry e : windSpeed){
-            windSpeedData[i++] = e.getY();
-        }
-
-        PearsonsCorrelation pearsonsCorrelation = new PearsonsCorrelation();
-        double temperatureSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, temperatureData);
-        double temperatureDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, temperatureData);
-
-        double pressureSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, pressureData);
-        double pressureDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, pressureData);
-
-        double humiditySystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, humidityData);
-        double humidityDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, humidityData);
-
-        double windSpeedSystolicCorrelationCoefficient = pearsonsCorrelation.correlation(systolicData, windSpeedData);
-        double windSpeedDiastolicCorrelationCoefficient = pearsonsCorrelation.correlation(diastolicData, windSpeedData);
-
-        DecimalFormat decimalFormatter = new DecimalFormat("#.###");
-
-        String temperatureSystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(temperatureSystolicCorrelationCoefficient));
-        String temperatureDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(temperatureDiastolicCorrelationCoefficient));
-        SpannableStringBuilder tempSpannable = new SpannableStringBuilder();
-        tempSpannable.append("Tensiune arterială sistolică - temperatură: ", new StyleSpan(Typeface.NORMAL), 0);
-        tempSpannable.append(temperatureSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED),0).append('\n');
-        tempSpannable.append("Tensiune arterială diastolică - temperatură: ", new StyleSpan(Typeface.NORMAL), 0);
-        tempSpannable.append(temperatureDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE),0);
-        bpTempCorrelationTv.setText(tempSpannable);
-
-        String pressureSystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(pressureSystolicCorrelationCoefficient));
-        String pressureDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(pressureDiastolicCorrelationCoefficient));
-        SpannableStringBuilder pressureSpannable = new SpannableStringBuilder();
-        pressureSpannable.append("Tensiune arterială sistolică - presiune atmosferică: ", new StyleSpan(Typeface.NORMAL), 0);
-        pressureSpannable.append(pressureSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED),0).append('\n');
-        pressureSpannable.append("Tensiune arterială diastolică - presiune atmosferică: ", new StyleSpan(Typeface.NORMAL), 0);
-        pressureSpannable.append(pressureDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE),0);
-        bpPressureCorrelationTv.setText(pressureSpannable);
-
-        String humiditySystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(humiditySystolicCorrelationCoefficient));
-        String humidityDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(humidityDiastolicCorrelationCoefficient));
-        SpannableStringBuilder humiditySpannable = new SpannableStringBuilder();
-        humiditySpannable.append("Tensiune arterială sistolică - umiditate: ", new StyleSpan(Typeface.NORMAL), 0);
-        humiditySpannable.append(humiditySystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED),0).append('\n');
-        humiditySpannable.append("Tensiune arterială diastolică - umiditate: ", new StyleSpan(Typeface.NORMAL), 0);
-        humiditySpannable.append(humidityDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE),0);
-        bpHumidityCorrelationTv.setText(humiditySpannable);
-
-        String windSpeedSystolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(windSpeedSystolicCorrelationCoefficient));
-        String windSpeedDiastolicCorrelationCoefficientString = String.valueOf(decimalFormatter.format(windSpeedDiastolicCorrelationCoefficient));
-        SpannableStringBuilder windSpeedSpannable = new SpannableStringBuilder();
-        windSpeedSpannable.append("Tensiune arterială sistolică - viteza vântului: ", new StyleSpan(Typeface.NORMAL), 0);
-        windSpeedSpannable.append(windSpeedSystolicCorrelationCoefficientString, new ForegroundColorSpan(Color.RED),0).append('\n');
-        windSpeedSpannable.append("Tensiune arterială diastolică - viteza vântului: ", new StyleSpan(Typeface.NORMAL), 0);
-        windSpeedSpannable.append(windSpeedDiastolicCorrelationCoefficientString, new ForegroundColorSpan(Color.BLUE),0);
-        bpWindSpeedCorrelationTv.setText(windSpeedSpannable);
-
     }
 
     private void showChartBloodPressure() {
@@ -931,7 +970,6 @@ public class StatisticsFragment extends Fragment {
         mv.setChartView(bloodPressureLc);
         bloodPressureLc.setMarker(mv);
     }
-
 
     private void showChartPulse() {
         pulseDataSet = new LineDataSet(null, null);
@@ -1572,7 +1610,6 @@ public class StatisticsFragment extends Fragment {
         hypertensionStagesPc.setData(pieData);
         hypertensionStagesPc.highlightValues(null);
         hypertensionStagesPc.invalidate();
-
     }
 
     private void createCharts() {
@@ -1719,10 +1756,5 @@ public class StatisticsFragment extends Fragment {
             }
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            //trainDataSet();
-        }
     }
 }

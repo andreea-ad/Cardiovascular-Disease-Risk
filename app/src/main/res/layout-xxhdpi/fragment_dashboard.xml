@@ -46,7 +46,7 @@
 
                     <TextView
                         android:id="@+id/systolicTitleTv"
-                        android:layout_width="72dp"
+                        android:layout_width="95dp"
                         android:layout_height="wrap_content"
                         android:text="@string/sys_dash_ro" />
 
@@ -63,20 +63,27 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/systolicTitleLl"
                     android:layout_margin="10dp"
-                    android:orientation="horizontal">
-
+                    android:orientation="vertical">
                     <TextView
-                        android:id="@+id/systolicValueTv"
+                        android:id="@+id/maxSystolicTv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="30sp" />
-
-                    <TextView
-                        android:id="@+id/systolicMetricTv"
-                        android:layout_width="wrap_content"
+                        android:text="@string/max" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/mmhg" />
-
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/systolicValueTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="30sp" />
+                        <TextView
+                            android:id="@+id/systolicMetricTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/mmhg"/>
+                    </LinearLayout>
                 </LinearLayout>
 
                 <com.github.mikephil.charting.charts.LineChart
@@ -112,7 +119,7 @@
 
                     <TextView
                         android:id="@+id/diastolicTitleTv"
-                        android:layout_width="72dp"
+                        android:layout_width="95dp"
                         android:layout_height="wrap_content"
                         android:text="@string/dia_dash_ro" />
 
@@ -129,20 +136,30 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/diastolicTitleLl"
                     android:layout_margin="10dp"
-                    android:orientation="horizontal">
-
+                    android:orientation="vertical">
                     <TextView
-                        android:id="@+id/diastolicValueTv"
+                        android:id="@+id/maxDiastolicTv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="30sp" />
+                        android:text="@string/max" />
 
-                    <TextView
-                        android:id="@+id/diastolicMetricTv"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/mmhg" />
+                        android:orientation="horizontal">
 
+                        <TextView
+                            android:id="@+id/diastolicValueTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="30sp" />
+
+                        <TextView
+                            android:id="@+id/diastolicMetricTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/mmhg" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <com.github.mikephil.charting.charts.LineChart
@@ -188,7 +205,7 @@
 
                     <TextView
                         android:id="@+id/pulseTitleTv"
-                        android:layout_width="72dp"
+                        android:layout_width="95dp"
                         android:layout_height="wrap_content"
                         android:text="@string/pulse_dash_ro" />
 

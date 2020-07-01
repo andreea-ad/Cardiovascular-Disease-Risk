@@ -12,11 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
@@ -68,6 +66,11 @@ public class CreateAccount100Activity extends AppCompatActivity {
         dialog.stopMonitor();
     }
 
+    /**
+     * Create User object with the data received from previous activities
+     * @param intent
+     * @return
+     */
     private UserProfile createUser(Intent intent) {
         UserProfile tempUserProfile = new UserProfile();
         String emailAddress = intent.getStringExtra("emailAddress");
@@ -100,6 +103,11 @@ public class CreateAccount100Activity extends AppCompatActivity {
         return tempUserProfile;
     }
 
+    /**
+     * Register user with email address and password
+     * @param emailAddress
+     * @param password
+     */
     private void registerUser(String emailAddress, String password) {
         firebaseAuth.createUserWithEmailAndPassword(emailAddress, password)
                 .addOnCompleteListener(this, task -> {
@@ -113,6 +121,10 @@ public class CreateAccount100Activity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Register user profile with the collected data from previous activities
+     * @param userProfile
+     */
     private void registerProfile(UserProfile userProfile) {
         databaseReference = firebaseDatabase.getReference("user-profile");
         String key = databaseReference.push().getKey();
@@ -120,28 +132,15 @@ public class CreateAccount100Activity extends AppCompatActivity {
             databaseReference.child(key).setValue(userProfile, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                    if(databaseError == null){
+                    if (databaseError == null) {
                         Toast.makeText(getApplicationContext(), "User profile successfully created.", Toast.LENGTH_SHORT).show();
-                    }else{
+                    } else {
                         Toast.makeText(getApplicationContext(), "User profile could not be created.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         }
 
-//        databaseReference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    Toast.makeText(getApplicationContext(), "User profile successfully created.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
     }
 }
 

@@ -21,6 +21,11 @@ public class InternetConnectionDialog {
         monitor();
     }
 
+    /**
+     * Create listener for monitoring changes in connection status
+     * If connection is lost, display the dialog
+     * If connection is active, dismiss the dialog
+     */
     private void monitor() {
         Tovuti.from(context).monitor(new Monitor.ConnectivityListener() {
             @Override
@@ -34,6 +39,9 @@ public class InternetConnectionDialog {
         });
     }
 
+    /**
+     * Create the dialog and set its layout
+     */
     private void createDialog() {
         internetConnectionDialog = new Dialog(context);
         internetConnectionDialog.setContentView(R.layout.dialog_no_internet_connection);
@@ -56,6 +64,4 @@ public class InternetConnectionDialog {
     public void stopMonitor() {
         Tovuti.from(context).stop();
     }
-
-
 }

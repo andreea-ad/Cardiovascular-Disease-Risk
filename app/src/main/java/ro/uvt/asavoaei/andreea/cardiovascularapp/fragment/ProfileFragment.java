@@ -90,6 +90,10 @@ public class ProfileFragment extends Fragment {
             disableUI();
             new PumpDataTask().execute();
             editProfileBtn.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Open edit mode
+                 * @param v
+                 */
                 @Override
                 public void onClick(View v) {
                     removeAccountIv.setVisibility(View.VISIBLE);
@@ -101,9 +105,13 @@ public class ProfileFragment extends Fragment {
                 }
             });
             addDiseaseBtn.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Display alert dialog to pick diseases
+                 * @param v
+                 */
                 @Override
                 public void onClick(View v) {
-                    final List<String> diseasesList = Arrays.asList(diseases); //Default diseases list
+                    final List<String> diseasesList = Arrays.asList(diseases);    // default diseases list
                     final List<String> selectedDiseasesList = new ArrayList<>();
                     AlertDialog displayDiseasesList = new AlertDialog.Builder(getActivity())
                             .setTitle("Alegeți afecțiunile de care suferiți")
@@ -135,6 +143,10 @@ public class ProfileFragment extends Fragment {
             diseasesRecyclerView.setAdapter(diseasesCustomAdapter);
 
             removeAccountIv.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Retrieve user profile by email address, remove user profile, remove account and start login activity
+                 * @param v
+                 */
                 @Override
                 public void onClick(View v) {
                     AlertDialog askForRemoval = new AlertDialog.Builder(getActivity())
@@ -187,6 +199,10 @@ public class ProfileFragment extends Fragment {
             });
 
             saveBtn.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Save modified data and return to view mode
+                 * @param v
+                 */
                 @Override
                 public void onClick(View v) {
                     saveData();
@@ -199,6 +215,10 @@ public class ProfileFragment extends Fragment {
             });
 
             logoutBtn.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Sign out from account and start login activity
+                 * @param v
+                 */
                 @Override
                 public void onClick(View v) {
                     firebaseAuth.signOut();
@@ -211,6 +231,9 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Assign user profile data to views
+     */
     private void setData() {
         nameEt.setText(currentUserProfile.getFirstname() + " " + currentUserProfile.getLastname());
         genderAgeTv.setText(currentUserProfile.getGender() + ", " + getAge(currentUserProfile.getDateOfBirth()) + " ani");
@@ -239,6 +262,9 @@ public class ProfileFragment extends Fragment {
         loadingDialog.dismissDialog();
     }
 
+    /**
+     * Retrieve diseases from DB and add them to the diseases array
+     */
     private void getDiseasesArray() {
         Query getDiseasesQuery = databaseReference.child("disease").orderByChild("diseaseName");
         getDiseasesQuery.addValueEventListener(new ValueEventListener() {
@@ -249,7 +275,6 @@ public class ProfileFragment extends Fragment {
                     diseases = new String[DISEASES_COUNT];
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         diseases[i] = snapshot.getValue(Disease.class).getName();
-                        Log.d(TAG, "Disease: " + diseases[i]);
                         i++;
                     }
                     checkedDiseases = new boolean[diseases.length];
@@ -264,6 +289,9 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Disable edit options for views
+     */
     private void disableUI() {
         nameEt.setEnabled(false);
         emailAddressEt.setEnabled(false);
@@ -274,6 +302,9 @@ public class ProfileFragment extends Fragment {
         pregnantCb.setClickable(false);
     }
 
+    /**
+     * Enable edit options for views
+     */
     private void enableUI() {
         nameEt.setEnabled(true);
         emailAddressEt.setEnabled(true);
@@ -284,6 +315,9 @@ public class ProfileFragment extends Fragment {
         pregnantCb.setClickable(true);
     }
 
+    /**
+     * Retreieve user profile data from DB
+     */
     private void getCurrentUserProfile() {
         Query getUserProfileByEmail = databaseReference.child("user-profile").orderByChild("emailAddress").equalTo(emailAddress);
         getUserProfileByEmail.addValueEventListener(new ValueEventListener() {
@@ -309,7 +343,7 @@ public class ProfileFragment extends Fragment {
                         }
                     }
                     setData();
-                }else{
+                } else {
                     loadingDialog.dismissDialog();
                 }
             }
@@ -321,6 +355,11 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Compute user age from date of birth
+     * @param dateOfBirth
+     * @return age
+     */
     private int getAge(String dateOfBirth) {
         try {
             Date currentDate = new Date();
@@ -335,6 +374,9 @@ public class ProfileFragment extends Fragment {
         return 0;
     }
 
+    /**
+     * Edit UserProfile object according to the modifications done by user and save them in the DB
+     */
     private void saveData() {
         currentUserProfile.setEmailAddress(emailAddressEt.getText().toString());
         String[] fullname = nameEt.getText().toString().split(" ");
@@ -354,9 +396,9 @@ public class ProfileFragment extends Fragment {
         getUserProfileByEmail.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        if(snapshot.getKey() != null){
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        if (snapshot.getKey() != null) {
                             databaseReference.child("user-profile").child(snapshot.getKey()).setValue(currentUserProfile);
                         }
                     }
@@ -370,6 +412,9 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Background task which retrieves diseases and user profile data from DB
+     */
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {
 
         @Override

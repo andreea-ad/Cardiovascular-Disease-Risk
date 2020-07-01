@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -90,6 +89,9 @@ public class HistoryFragment extends Fragment {
                         option = SORT_DESCENDING;
                         break;
                 }
+                /**
+                 * Sort list of cardio and weather records by selected filter
+                 */
                 switch (checkedId) {
                     case R.id.recordingDateRb:
                         cardioAndWeatherRecordList = sortBy(listToSort, RECORDING_DATE, option);
@@ -102,9 +104,6 @@ public class HistoryFragment extends Fragment {
                         break;
                 }
                 setAdapter();
-                for (CardioAndWeatherRecord c : cardioAndWeatherRecordList) {
-                    Log.d(TAG, " TIME RG " + c);
-                }
             });
 
             sortRg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -120,6 +119,9 @@ public class HistoryFragment extends Fragment {
                             option = SORT_DESCENDING;
                             break;
                     }
+                    /**
+                     * Sort list of cardio and weather records by selected filter
+                     */
                     switch (id) {
                         case R.id.recordingDateRb:
                             cardioAndWeatherRecordList = sortBy(listToSort, RECORDING_DATE, option);
@@ -132,9 +134,6 @@ public class HistoryFragment extends Fragment {
                             break;
                     }
                     setAdapter();
-                    for (CardioAndWeatherRecord c : cardioAndWeatherRecordList) {
-                        Log.d(TAG, " SORT RG " + c);
-                    }
                 }
             });
 
@@ -143,14 +142,14 @@ public class HistoryFragment extends Fragment {
         return v;
     }
 
+    /**
+     * Initialize list with all the data from the DB and sort it ascending by recording date
+     */
     private void initializeList() {
         cardioAndWeatherRecordList = sortBy(listToSort, RECORDING_DATE, SORT_ASCENDING);
-        if(!cardioAndWeatherRecordList.isEmpty()) {
-            for (CardioAndWeatherRecord c : cardioAndWeatherRecordList) {
-                Log.d(TAG, "SORTED: " + c);
-            }
+        if (!cardioAndWeatherRecordList.isEmpty()) {
             setAdapter();
-        }else{
+        } else {
             Toast.makeText(getContext(), "Nu au fost găsite date în baza de date.", Toast.LENGTH_LONG).show();
         }
         loadingDialog.dismissDialog();
@@ -171,6 +170,13 @@ public class HistoryFragment extends Fragment {
         return list;
     }
 
+    /**
+     * Compare recording dates
+     * @param c1
+     * @param c2
+     * @param order
+     * @return 0 (equal dates), 1 (date no. 1 is after date no. 2), -1 (date no. 1 is before date no. 2)
+     */
     private int sortByRecordingDate(CardioAndWeatherRecord c1, CardioAndWeatherRecord c2, int order) {
         String time1 = c1.getRecordingDate() + " " + c1.getRecordingHour();
         String time2 = c2.getRecordingDate() + " " + c2.getRecordingHour();
@@ -206,6 +212,13 @@ public class HistoryFragment extends Fragment {
         return 0;
     }
 
+    /**
+     * Compare blood pressure values
+     * @param c1
+     * @param c2
+     * @param order
+     * @return positive (blood pressure no. 1 is higher than blood pressure no. 2), negative (blood pressure no. 1 is lower than blood pressure no. 2) value or 0 (equal blood pressure values)
+     */
     private int sortByBloodPressure(CardioAndWeatherRecord c1, CardioAndWeatherRecord c2, int order) {
         switch (order) {
             case SORT_ASCENDING:
@@ -222,6 +235,13 @@ public class HistoryFragment extends Fragment {
         return 0;
     }
 
+    /**
+     * Compare pulse values
+     * @param c1
+     * @param c2
+     * @param order
+     * @return positive (pulse no. 1 is higher than pulse no. 2), negative (pulse no. 1 is lower than pulse no. 2) value or 0 (equal pulse values)
+     */
     private int sortByPulse(CardioAndWeatherRecord c1, CardioAndWeatherRecord c2, int order) {
         switch (order) {
             case SORT_ASCENDING:
@@ -238,6 +258,9 @@ public class HistoryFragment extends Fragment {
         historyRecyclerView.setAdapter(recordsCustomAdapter);
     }
 
+    /**
+     * Retrieve all cardio records from DB belonging to the authenticated user
+     */
     private void getCardio() {
         Query getCardioRecordsByEmail = databaseReference.child("cardio-record").orderByChild("emailAddress").equalTo(emailAddress);
         getCardioRecordsByEmail.addValueEventListener(new ValueEventListener() {
@@ -248,12 +271,11 @@ public class HistoryFragment extends Fragment {
                     for (final DataSnapshot cardio : dataSnapshot.getChildren()) {
                         CardioRecord cardioRecord = cardio.getValue(CardioRecord.class);
                         if (cardioRecord != null) {
-                            Log.d(TAG, "Car: " + cardioRecord);
                             allCardioRecordsByUser.add(cardioRecord);
                         }
                     }
                     getWeather();
-                }else{
+                } else {
                     loadingDialog.dismissDialog();
                 }
             }
@@ -266,6 +288,10 @@ public class HistoryFragment extends Fragment {
 
     }
 
+    /**
+     * Retrieve weather data
+     * Filter the data by timestamp (keep only the weather data that can be mapped to a cardio record)
+     */
     private void getWeather() {
         Query getWeatherDataByCity = databaseReference.child("weather-record").orderByChild("city").equalTo(userCity);
         getWeatherDataByCity.addValueEventListener(new ValueEventListener() {
@@ -280,18 +306,17 @@ public class HistoryFragment extends Fragment {
                         }
                     }
                     filteredWeatherRecords = new HashSet<>();
-                    //FILTER WEATHER RECORDS
                     for (CardioRecord c : allCardioRecordsByUser) {
                         for (WeatherRecord w : allWeatherRecordsByCity) {
                             String recHourC = c.getRecordingHour().split(":")[0];
                             String recHourW = w.getRecordingHour().split(":")[0];
-                            if (c.getRecordingDate().equals(w.getRecordingDate()) && recHourC.equals(recHourW)) {
+                            if (c.getRecordingDate().equals(w.getRecordingDate()) && recHourC.equals(recHourW)) {    // filter weather records by timestamp
                                 filteredWeatherRecords.add(w);
                             }
                         }
                     }
                     concatenateLists();
-                }else{
+                } else {
                     loadingDialog.dismissDialog();
                 }
             }
@@ -303,6 +328,9 @@ public class HistoryFragment extends Fragment {
         });
     }
 
+    /**
+     * Retrieve user profile data from the DB
+     */
     private void setUserData() {
         Query getUserProfileByEmail = databaseReference.child("user-profile").orderByChild("emailAddress").equalTo(emailAddress).limitToFirst(1);
         getUserProfileByEmail.addValueEventListener(new ValueEventListener() {
@@ -319,7 +347,7 @@ public class HistoryFragment extends Fragment {
                         }
                     }
                     getCardio();
-                }else{
+                } else {
                     loadingDialog.dismissDialog();
                 }
             }
@@ -331,8 +359,11 @@ public class HistoryFragment extends Fragment {
         });
     }
 
+    /**
+     * Create a list containing the cardio records and weather records mapped by timestamp
+     */
     private void concatenateLists() {
-        if(!allCardioRecordsByUser.isEmpty() && !filteredWeatherRecords.isEmpty()) {
+        if (!allCardioRecordsByUser.isEmpty() && !filteredWeatherRecords.isEmpty()) {
             for (CardioRecord c : allCardioRecordsByUser) {
                 for (WeatherRecord w : filteredWeatherRecords) {
                     if (c.getRecordingDate().equals(w.getRecordingDate()) && c.getRecordingHour().split(":")[0].equals(w.getRecordingHour().split(":")[0])) {
@@ -358,6 +389,9 @@ public class HistoryFragment extends Fragment {
         }
     }
 
+    /**
+     * Background task to retrieve data from the DB
+     */
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {
 
         @Override

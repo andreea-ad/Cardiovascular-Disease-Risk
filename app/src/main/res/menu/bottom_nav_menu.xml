@@ -11,7 +11,7 @@
         android:id="@+id/action_stats"
         android:enabled="true"
         android:icon="@drawable/ic_equalizer_black_24dp"
-        android:title="Statistici"
+        android:title="Statistică"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_add"

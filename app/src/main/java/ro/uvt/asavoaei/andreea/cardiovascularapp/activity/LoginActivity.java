@@ -1,15 +1,12 @@
 package ro.uvt.asavoaei.andreea.cardiovascularapp.activity;
 
-import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,7 +19,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -54,24 +50,20 @@ public class LoginActivity extends AppCompatActivity {
         registerString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)), 18, 33, 0);
         registerButton.setText(registerString, TextView.BufferType.SPANNABLE);
 
-        forgotPassButton.setOnClickListener(new View.OnClickListener(){
-
+        forgotPassButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Display an alert dialog that asks for email address in order to send a link for password recovery
+             * @param v
+             */
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_et, null);
-
-                // Specify alert dialog is not cancelable/not ignorable
                 builder.setCancelable(false);
-
-                // Set the custom layout as alert dialog view
                 builder.setView(dialogView);
-
                 final EditText emailEt = (EditText) dialogView.findViewById(R.id.emailEt);
 
-                // Create the alert dialog
                 final AlertDialog dialog = builder
                         .setTitle("Introduceți adresa dvs. de email.")
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -99,9 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                         })
                         .create();
                 dialog.show();
-            }});
+            }
+        });
 
-
+        /**
+         * Login into account and start MainActivity
+         */
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,4 +122,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dialog.stopMonitor();
+    }
 }

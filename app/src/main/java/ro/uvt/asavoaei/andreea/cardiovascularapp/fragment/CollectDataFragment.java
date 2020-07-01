@@ -109,7 +109,6 @@ public class CollectDataFragment extends Fragment {
         saveButton = view.findViewById(R.id.saveBtn);
 
         if (firebaseAuth.getCurrentUser() != null) {
-
             currentUserEmailAddress = firebaseAuth.getCurrentUser().getEmail();
             new PumpDataTask().execute();
 
@@ -244,6 +243,9 @@ public class CollectDataFragment extends Fragment {
             });
 
             addMedicationButton.setOnClickListener(v -> {
+                /**
+                 * Display the alert dialog to pick the medication
+                 */
                 final List<String> medicationList = Arrays.asList(medications); //Default medication list
                 AlertDialog displayMedicationList = new AlertDialog.Builder(getActivity())
                         .setTitle("Alegeți medicația administrată")
@@ -288,6 +290,9 @@ public class CollectDataFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Convert the date to the correct formatter (DD-MM-YYYY)
+     */
     private void updateDate() {
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormatter);
         String selectedDate = sdf.format(myCalendar.getTime());
@@ -298,6 +303,11 @@ public class CollectDataFragment extends Fragment {
         return number <= 9 ? "0" + number : String.valueOf(number);
     }
 
+    /**
+     * Check if the selected measurement date is valid (must be before the current date)
+     * @param selectedDate
+     * @return
+     */
     private boolean checkDate(String selectedDate) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(dateFormatter);
@@ -313,6 +323,12 @@ public class CollectDataFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Check if the selected hour is valid (must be before the current date and hour)
+     * @param selectedDate
+     * @param selectedHour
+     * @return true or false
+     */
     private boolean checkHour(String selectedDate, String selectedHour) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(dateFormatter);
@@ -337,6 +353,11 @@ public class CollectDataFragment extends Fragment {
 
     }
 
+    /**
+     * Check if the cholesterol value is valid
+     * @param cholesterolValue
+     * @return true or false
+     */
     private boolean checkCholesterol(int cholesterolValue) {
         boolean isValid = false;
         if (cholesterolValue >= cholesterolMinimumValue && cholesterolValue <= cholesterolMaximumValue) {
@@ -349,10 +370,14 @@ public class CollectDataFragment extends Fragment {
         } else {
             cholesterolEt.setError(null);
         }
-
         return isValid;
     }
 
+    /**
+     * Check if the weight value is valid
+     * @param weightValue
+     * @return true or false
+     */
     private boolean checkWeight(int weightValue) {
         boolean isValid = false;
         if (weightValue >= weightMinimumValue && weightValue <= weightMaximumValue) {
@@ -369,8 +394,11 @@ public class CollectDataFragment extends Fragment {
         return isValid;
     }
 
+    /**
+     * Retrieve the medication data from the DB and populate the medication array
+     */
     private void getMedicationArray() {
-        Query medicationQuery = databaseReference.child("medication").orderByChild("medicationName");
+        Query medicationQuery = databaseReference.child("medication").orderByChild("medicationName");  // query the DB for the medication and order by name
         medicationQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -401,7 +429,6 @@ public class CollectDataFragment extends Fragment {
         setCurrentHour();
         setCholesterol();
         setWeight();
-        //setMedication();
         loadingDialog.dismissDialog();
     }
 
@@ -425,8 +452,14 @@ public class CollectDataFragment extends Fragment {
         recordingHourEt.setText(getCurrentHour());
     }
 
+    /**
+     * Retrieve last value of cholesterol from the DB and set it to the text view as default value
+     */
     private void setCholesterol() {
-        Query getCardioRecordsByEmail = databaseReference.child("cardio-record").orderByChild("emailAddress").equalTo(currentUserEmailAddress).limitToLast(1);
+        Query getCardioRecordsByEmail = databaseReference.child("cardio-record")
+                .orderByChild("emailAddress")
+                .equalTo(currentUserEmailAddress)
+                .limitToLast(1);  // query the DB for last medical record of the current user
         getCardioRecordsByEmail.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -434,7 +467,7 @@ public class CollectDataFragment extends Fragment {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         CardioRecord cardioRecord = snapshot.getValue(CardioRecord.class);
                         if (cardioRecord != null) {
-                            lastCholesterol = cardioRecord.getCholesterol();
+                            lastCholesterol = cardioRecord.getCholesterol();  // get the cholesterol value
                             cholesterolEt.setText(String.valueOf(lastCholesterol));
                             break;
                         }
@@ -450,8 +483,14 @@ public class CollectDataFragment extends Fragment {
 
     }
 
+    /**
+     * Retrieve last value of weight from the DB and set it to the text view as the default value
+     */
     private void setWeight() {
-        Query getCardioRecordsByEmail = databaseReference.child("cardio-record").orderByChild("emailAddress").equalTo(currentUserEmailAddress).limitToLast(1);
+        Query getCardioRecordsByEmail = databaseReference.child("cardio-record")
+                .orderByChild("emailAddress")
+                .equalTo(currentUserEmailAddress)
+                .limitToLast(1);
         getCardioRecordsByEmail.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -474,8 +513,14 @@ public class CollectDataFragment extends Fragment {
         });
     }
 
+    /**
+     * Retrieve last array of medication from the DB and set it to the list of medications of the recycler view
+     */
     private void setMedication() {
-        Query getCardioRecordsByEmail = databaseReference.child("cardio-record").orderByChild("emailAddress").equalTo(currentUserEmailAddress).limitToLast(1);
+        Query getCardioRecordsByEmail = databaseReference.child("cardio-record")
+                .orderByChild("emailAddress")
+                .equalTo(currentUserEmailAddress)
+                .limitToLast(1);
         getCardioRecordsByEmail.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -489,7 +534,6 @@ public class CollectDataFragment extends Fragment {
                             selectedMedicationList = new ArrayList<>(selectedMedication.values());
                             for (int i = 0; i < medications.length; i++) {
                                 if (selectedMedicationList.contains(medications[i])) {
-                                    Log.d(TAG, "Medication: " + medications[i]);
                                     checkedMedication[i] = true;
                                 }
                             }
@@ -509,6 +553,9 @@ public class CollectDataFragment extends Fragment {
         });
     }
 
+    /**
+     * Set collected data to the CardioRecord object to be saved in the DB
+     */
     private void setDataToRecord() {
         cardioRecordToRegister.setEmailAddress(currentUserEmailAddress);
         cardioRecordToRegister.setSystolicBP(systolicNumberPicker.getValue());
@@ -522,6 +569,9 @@ public class CollectDataFragment extends Fragment {
         cardioRecordToRegister.setMedication(selectedMedication);
     }
 
+    /**
+     * Save in the DB the CardioRecord object created with the medical data of the user
+     */
     private void saveData() {
         if (getContext() != null) {
             databaseReference = firebaseDatabase.getReference("cardio-record");
@@ -530,9 +580,9 @@ public class CollectDataFragment extends Fragment {
                 databaseReference.child(key).setValue(cardioRecordToRegister, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        if(databaseError == null){
+                        if (databaseError == null) {
                             Toast.makeText(getContext(), "Datele au fost înregistrate cu succes.", Toast.LENGTH_SHORT).show();
-                        }else{
+                        } else {
                             Toast.makeText(getContext(), "Datele nu au putut fi înregistrate.", Toast.LENGTH_SHORT).show();
                         }
                         loadingDialog.dismissDialog();
@@ -542,6 +592,9 @@ public class CollectDataFragment extends Fragment {
         }
     }
 
+    /**
+     * Background task to get the medication data from the DB and last recording to set as default value
+     */
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -557,6 +610,9 @@ public class CollectDataFragment extends Fragment {
         }
     }
 
+    /**
+     * Background task to save the recording into the DB
+     */
     private class SaveDataTask extends AsyncTask<Void, Void, Void> {
 
         @Override

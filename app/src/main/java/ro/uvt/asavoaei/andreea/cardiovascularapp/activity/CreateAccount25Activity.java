@@ -90,6 +90,9 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
         });
 
         fabNext.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Send collected data from the user to the next activity and start it
+             */
             @Override
             public void onClick(View v) {
                 if (isFirstNameValid && isLastNameValid && !cityEt.getText().toString().isEmpty()) {
@@ -109,7 +112,7 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
 
         checkLocationPermission();
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);   // activate location manager
         Criteria criteria = new Criteria();
         locationProvider = locationManager.getBestProvider(criteria, false);
         Location location = locationManager.getLastKnownLocation(locationProvider);
@@ -122,6 +125,9 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
         }
     }
 
+    /**
+     * Check if the permission for location is provided. If not, send permission request
+     */
     public void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(CreateAccount25Activity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 99);
@@ -132,7 +138,7 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
     protected void onResume() {
         super.onResume();
         try {
-            locationManager.requestLocationUpdates(locationProvider, 400, 1, this);
+            locationManager.requestLocationUpdates(locationProvider, 400, 1, this);    // check if the location has changed
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -151,6 +157,10 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
         dialog.stopMonitor();
     }
 
+    /**
+     * Set current location into the edit text
+     * @param location
+     */
     @Override
     public void onLocationChanged(Location location) {
         double latitude = location.getLatitude();
@@ -163,7 +173,6 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -181,36 +190,41 @@ public class CreateAccount25Activity extends AppCompatActivity implements Locati
 
     }
 
+    /**
+     * Check if first name is valid (length-wise)
+     * @param firstName
+     * @return true or false
+     */
     private boolean checkFirstName(String firstName) {
         boolean isValid = false;
         if (firstName.length() >= firstNameMinimumLength) {
             isValid = true;
         }
-
         if (!isValid) {
             firstNameEt.setError("Prenumele trebuie să conțină minim " + firstNameMinimumLength + " caractere.");
             firstNameEt.requestFocus();
         } else {
             firstNameEt.setError(null);
         }
-
         return isValid;
     }
 
+    /**
+     * Check if last name is valid (length-wise)
+     * @param lastName
+     * @return true or false
+     */
     private boolean checkLastName(String lastName) {
         boolean isValid = false;
         if (lastName.length() >= lastNameMinimumLength) {
             isValid = true;
         }
-
         if (!isValid) {
             lastNameEt.setError("Numele trebuie să conțină minim " + lastNameMinimumLength + " caractere.");
             lastNameEt.requestFocus();
         } else {
             lastNameEt.setError(null);
         }
-
         return isValid;
     }
-
 }

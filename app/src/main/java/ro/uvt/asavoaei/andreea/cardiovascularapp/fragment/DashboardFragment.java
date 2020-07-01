@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,6 @@ import ro.uvt.asavoaei.andreea.cardiovascularapp.R;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.dialog.LoadingDialog;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.model.CardioRecord;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.model.UserProfile;
-import ro.uvt.asavoaei.andreea.cardiovascularapp.model.WeatherRecord;
 import ro.uvt.asavoaei.andreea.cardiovascularapp.utils.FloatValueFormatter;
 
 public class DashboardFragment extends Fragment {
@@ -154,6 +152,8 @@ public class DashboardFragment extends Fragment {
                         diastolic.add(new Entry(i, diastolicValues.get(i)));
                     }
                     showChartDiastolic();
+                } else {
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -164,6 +164,9 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    /**
+     * Display line chart with the last 3 values of systolic blood pressure
+     */
     private void showChartSystolic() {
         if (!isDetached() && getContext() != null) {
             systolicDataSet.setValues(systolic);
@@ -218,6 +221,9 @@ public class DashboardFragment extends Fragment {
 
     }
 
+    /**
+     * Display line chart with the last 3 values of diastolic blood pressure
+     */
     private void showChartDiastolic() {
         if (!isDetached() && getContext() != null) {
             diastolicDataSet.setValues(diastolic);
@@ -271,7 +277,9 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-
+    /**
+     * Find the maximum value of the blood pressure
+     */
     private void computeMaximumValues() {
         Query getCardioRecordsByEmail = databaseReference.child("cardio-record").orderByChild("emailAddress").equalTo(emailAddress);
         getCardioRecordsByEmail.addValueEventListener(new ValueEventListener() {
@@ -292,6 +300,8 @@ public class DashboardFragment extends Fragment {
                     }
                     systolicTv.setText(String.valueOf(maxSystolic));
                     diastolicTv.setText(String.valueOf(maxDiastolic));
+                } else {
+                    loadingDialog.dismissDialog();
                 }
             }
 
@@ -302,8 +312,14 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    /**
+     * Retrieve last value of heart rate and cholesterol from the DB
+     */
     private void getLastPulseAndCholesterol() {
-        Query getCardioRecordsByEmail = databaseReference.child("cardio-record").orderByChild("emailAddress").equalTo(emailAddress).limitToLast(1);
+        Query getCardioRecordsByEmail = databaseReference.child("cardio-record")
+                .orderByChild("emailAddress")
+                .equalTo(emailAddress)
+                .limitToLast(1);
         getCardioRecordsByEmail.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -317,8 +333,8 @@ public class DashboardFragment extends Fragment {
                     }
                     pulseTv.setText(String.valueOf(lastPulse));
                     cholesterolTv.setText(String.valueOf(lastCholesterol));
-                    loadingDialog.dismissDialog();
                 }
+                loadingDialog.dismissDialog();
             }
 
             @Override
@@ -329,6 +345,9 @@ public class DashboardFragment extends Fragment {
         });
     }
 
+    /**
+     * Background task to get data from the DB and populate the views
+     */
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -344,8 +363,5 @@ public class DashboardFragment extends Fragment {
             getLastPulseAndCholesterol();
             return null;
         }
-
     }
-
-
 }

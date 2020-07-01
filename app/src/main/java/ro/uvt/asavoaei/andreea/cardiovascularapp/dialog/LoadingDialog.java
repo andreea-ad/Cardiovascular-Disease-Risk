@@ -17,7 +17,9 @@ public class LoadingDialog {
         createDialog();
     }
 
-
+    /**
+     * Create the dialog and set its layout
+     */
     private void createDialog() {
         loadingDialog = new Dialog(context);
         loadingDialog.setContentView(R.layout.dialog_loading);
@@ -36,5 +38,4 @@ public class LoadingDialog {
             loadingDialog.dismiss();
         }
     }
-
 }

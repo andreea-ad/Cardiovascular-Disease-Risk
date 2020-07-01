@@ -71,6 +71,9 @@ public class CreateAccount0Activity extends AppCompatActivity {
         });
 
         fabNext.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Send collected data from the user to the next activity and start it
+             */
             @Override
             public void onClick(View v) {
                 if (isEmailValid && isPasswordValid) {
@@ -89,34 +92,38 @@ public class CreateAccount0Activity extends AppCompatActivity {
         dialog.stopMonitor();
     }
 
+    /**
+     * Check if the email address is valid
+     * @param emailAddress
+     * @return true or false
+     */
     private boolean checkEmail(String emailAddress) {
         boolean isValid = Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches();
-
         if (!isValid) {
             emailAddressEt.setError("Adresa de email introdusă nu este validă.");
             emailAddressEt.requestFocus();
         } else {
             emailAddressEt.setError(null);
         }
-
         return isValid;
     }
 
+    /**
+     * Check if the password is valid (length-wise)
+     * @param password
+     * @return true or false
+     */
     private boolean checkPassword(String password) {
         boolean isValid = false;
         if (password.length() >= passwordMinimumLength) {
             isValid = true;
         }
-
         if (!isValid) {
             passwordEt.setError("Parola trebuie să conțină minim " + passwordMinimumLength + " caractere.");
             passwordEt.requestFocus();
         } else {
             passwordEt.setError(null);
         }
-
         return isValid;
     }
-
-
 }

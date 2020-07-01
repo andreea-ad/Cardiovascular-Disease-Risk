@@ -58,8 +58,8 @@
                 android:id="@+id/recordingHourCv"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_layout_margin"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="@dimen/default_layout_margin"
                 android:layout_toEndOf="@id/recordingDateCv"
                 app:cardCornerRadius="@dimen/cardview_corner_radius"
                 app:cardUseCompatPadding="true">
@@ -90,8 +90,8 @@
             android:id="@+id/BPandHRTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_layout_margin"
             android:layout_marginStart="20dp"
+            android:layout_marginTop="@dimen/default_layout_margin"
             android:text="@string/bp_and_hr_ro"
             android:textSize="18sp" />
 
@@ -116,8 +116,8 @@
                     android:id="@+id/BPandHrLl2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginEnd="5dp"
                     android:orientation="horizontal">
 

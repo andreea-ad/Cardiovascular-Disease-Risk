@@ -93,6 +93,9 @@ public class CreateAccount50Activity extends AppCompatActivity {
         });
 
         fabNext.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Send collected data from the user to the next activity and start it
+             */
             @Override
             public void onClick(View v) {
                 if (isBirthdayValid && isGenderValid() && isHeightValid) {
@@ -116,10 +119,7 @@ public class CreateAccount50Activity extends AppCompatActivity {
                 }
             }
         });
-
-
         circularProgressIndicator.setProgress(50, 100);
-
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -179,6 +179,10 @@ public class CreateAccount50Activity extends AppCompatActivity {
         dialog.stopMonitor();
     }
 
+    /**
+     * Check if gender is valid
+     * @return true or false
+     */
     private boolean isGenderValid() {
         boolean isValid = false;
         String genderStr = genderSpinner.getSelectedItem().toString();
@@ -186,13 +190,17 @@ public class CreateAccount50Activity extends AppCompatActivity {
         if (genderStr.equals("Femeie") || genderStr.equals("Bărbat")) {
             isValid = true;
         }
-
         return isValid;
     }
 
+    /**
+     * Check if height is valid
+     * @param height
+     * @return true or false
+     */
     private boolean checkHeight(int height) {
         boolean isValid = false;
-        if (height >= 55 && height <= 272) {
+        if (height >= heightMinimumValue && height <= heightMaximumValue) {
             isValid = true;
         }
 
@@ -202,7 +210,6 @@ public class CreateAccount50Activity extends AppCompatActivity {
         } else {
             heightEt.setError(null);
         }
-
         return isValid;
     }
 }

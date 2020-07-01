@@ -65,9 +65,13 @@ public class CreateAccount75Activity extends AppCompatActivity {
         Button addDiseaseButton = findViewById(R.id.addDiseaseBtn);
 
         addDiseaseButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Display alert dialog to pick diseases
+             * @param v
+             */
             @Override
             public void onClick(View v) {
-                final List<String> diseasesList = Arrays.asList(diseases); //Default diseases list
+                final List<String> diseasesList = Arrays.asList(diseases);  // default diseases list
                 final List<String> selectedDiseasesList = new ArrayList<>();
                 AlertDialog displayDiseasesList = new AlertDialog.Builder(CreateAccount75Activity.this)
                         .setTitle("Alegeți afecțiunile de care suferiți")
@@ -102,6 +106,9 @@ public class CreateAccount75Activity extends AppCompatActivity {
         circularProgressIndicator.setProgress(75, 100);
 
         fabNext.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Send collected data from the user to the next activity and start it
+             */
             @Override
             public void onClick(View v) {
                 Intent open = new Intent(getApplicationContext(), CreateAccount100Activity.class);
@@ -126,10 +133,14 @@ public class CreateAccount75Activity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        dialog.stopMonitor();
     }
 
+    /**
+     * Retrieve diseases data from the DB and populate the array
+     */
     private void getDiseasesArray() {
-        Query query = diseaseDbReference.child("disease").orderByChild("diseaseName");
+        Query query = diseaseDbReference.child("disease").orderByChild("diseaseName");  // query the DB for diseases and order them by name
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -138,7 +149,6 @@ public class CreateAccount75Activity extends AppCompatActivity {
                     diseases = new String[DISEASES_COUNT];
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         diseases[i] = snapshot.getValue(Disease.class).getName();
-                        Log.d(TAG, "Disease: " + diseases[i]);
                         i++;
                     }
                     checkedDiseases = new boolean[diseases.length];
@@ -170,6 +180,9 @@ public class CreateAccount75Activity extends AppCompatActivity {
         return diseases.toString();
     }
 
+    /**
+     * Background task that retrieves diseases list from the DB
+     */
     private class PumpDataTask extends AsyncTask<Void, Void, Void> {
 
         @Override

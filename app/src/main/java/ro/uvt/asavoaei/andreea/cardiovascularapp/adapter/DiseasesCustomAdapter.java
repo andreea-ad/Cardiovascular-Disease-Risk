@@ -27,6 +27,12 @@ public class DiseasesCustomAdapter extends RecyclerView.Adapter<DiseasesCustomAd
         this.diseasesList = diseasesList;
     }
 
+    /**
+     * Create view holder and inflate to it the layout with the recyclerview
+     * @param viewGroup
+     * @param i
+     * @return DiseasesViewHolder
+     */
     @NonNull
     @Override
     public DiseasesViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -34,6 +40,11 @@ public class DiseasesCustomAdapter extends RecyclerView.Adapter<DiseasesCustomAd
         return new DiseasesViewHolder(view);
     }
 
+    /**
+     * Populate the view holder with the diseases
+     * @param diseasesViewHolder
+     * @param i
+     */
     @Override
     public void onBindViewHolder(@NonNull DiseasesViewHolder diseasesViewHolder, int i) {
         String currentDisease = diseasesList.get(i);
@@ -45,6 +56,9 @@ public class DiseasesCustomAdapter extends RecyclerView.Adapter<DiseasesCustomAd
         return diseasesList.size();
     }
 
+    /**
+     * Create and initialize the view holder element(s)
+     */
     static class DiseasesViewHolder extends RecyclerView.ViewHolder {
         TextView diseaseName;
 
@@ -52,8 +66,5 @@ public class DiseasesCustomAdapter extends RecyclerView.Adapter<DiseasesCustomAd
             super(itemView);
             diseaseName = itemView.findViewById(R.id.itemNameTv);
         }
-
     }
-
-
 }

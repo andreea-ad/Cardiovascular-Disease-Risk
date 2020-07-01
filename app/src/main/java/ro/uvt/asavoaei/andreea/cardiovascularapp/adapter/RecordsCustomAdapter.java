@@ -21,6 +21,12 @@ public class RecordsCustomAdapter extends RecyclerView.Adapter<RecordsCustomAdap
         this.cardioAndWeatherRecordsList = cardioAndWeatherRecordsList;
     }
 
+    /**
+     * Create view holder and inflate to it the layout for the recycler view
+     * @param parent
+     * @param viewType
+     * @return RecordsViewHolder
+     */
     @NonNull
     @Override
     public RecordsCustomAdapter.RecordsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -28,6 +34,11 @@ public class RecordsCustomAdapter extends RecyclerView.Adapter<RecordsCustomAdap
         return new RecordsCustomAdapter.RecordsViewHolder(view);
     }
 
+    /**
+     * Populate the view holder with medical and weather data
+     * @param holder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(@NonNull RecordsCustomAdapter.RecordsViewHolder holder, int position) {
         CardioAndWeatherRecord cardioAndWeatherRecord = cardioAndWeatherRecordsList.get(position);
@@ -45,13 +56,13 @@ public class RecordsCustomAdapter extends RecyclerView.Adapter<RecordsCustomAdap
 
         holder.bmi.setText(String.valueOf(cardioAndWeatherRecord.getBMI()));
 
-        String temperatureStr = cardioAndWeatherRecord.getTemperature() + "°C";
+        String temperatureStr = cardioAndWeatherRecord.getTemperature() + " °C";
         holder.temperature.setText(temperatureStr);
 
-        String humidityStr = cardioAndWeatherRecord.getHumidity() + "%";
+        String humidityStr = cardioAndWeatherRecord.getHumidity() + " %";
         holder.humidity.setText(humidityStr);
 
-        String pressureStr = cardioAndWeatherRecord.getPressure() + "mb";
+        String pressureStr = cardioAndWeatherRecord.getPressure() + " mb";
         holder.pressure.setText(pressureStr);
 
         holder.nebulosity.setText(cardioAndWeatherRecord.getNebulosity());
@@ -69,12 +80,14 @@ public class RecordsCustomAdapter extends RecyclerView.Adapter<RecordsCustomAdap
         return cardioAndWeatherRecordsList.size();
     }
 
+    /**
+     * Create and initialize the view holder elements
+     */
     public class RecordsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView recordingDate, bloodPressure, pulse, cholesterol, bmi, temperature, humidity, pressure, nebulosity;
         CheckBox pregnant, smoker;
 
-
-        public RecordsViewHolder(@NonNull View itemView) {
+        RecordsViewHolder(@NonNull View itemView) {
             super(itemView);
             recordingDate = itemView.findViewById(R.id.recordingDateTv);
             bloodPressure = itemView.findViewById(R.id.bloodPressureValueTv);

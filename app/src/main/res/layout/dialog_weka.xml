@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/default_dialog_background">
+    android:background="@drawable/default_dialog_background"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/statisticsTitleTv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:text="@string/statistics_ro"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:textSize="22sp"
-        android:textStyle="bold" />
     <TextView
         android:id="@+id/statisticsTv"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
         android:layout_margin="20dp"
-        android:scrollbars="vertical"/>
-
+        android:scrollbars="vertical"
+        android:textSize="16sp" />
 </LinearLayout>

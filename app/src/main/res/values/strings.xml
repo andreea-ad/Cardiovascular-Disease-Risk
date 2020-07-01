@@ -48,6 +48,7 @@
     <string name="cholesterol_dash_ro">Colesterol</string>
     <string name="bpm">bpm</string>
     <string name="mmhg">mmHg</string>
+    <string name="max">max</string>
     <string name="last_week_ro">Ultima\nsăptămână</string>
     <string name="last_month_ro">Ultima\nlună</string>
     <string name="last_year_ro">Ultimul\nan</string>
@@ -76,8 +77,10 @@
     <string name="nebulosity_ro">Nebulozitate:</string>
     <string name="logout_ro">Deconectare</string>
     <string name="correlation_coefficient_ro">Coeficientul de corelație</string>
+    <string name="prediction_ro">Metode de predicție</string>
     <string name="linear_regression_ro">Regresie liniară</string>
-    <string name="multilayer_perceptron_ro">MultiLayer Perceptron</string>
-    <string name="smoreg_ro">SMO Reg</string>
-    <string name="statistics_ro">Informații statistice</string>
+    <string name="multilayer_perceptron_ro">Rețele neuronale</string>
+    <string name="smoreg_ro">Regresie bazată pe\nvectori suport</string>
+    <string name="current_weather_ro">Condițiile meteorologice curente</string>
+    <string name="estimated_value_ro">Valoarea estimată</string>
 </resources>

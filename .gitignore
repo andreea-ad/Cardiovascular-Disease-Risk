@@ -16,4 +16,5 @@
 /app/google-services.json
 /app/*.json
 
-/docs/*
+/screenshots/*
+
